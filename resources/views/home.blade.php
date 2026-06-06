@@ -164,7 +164,7 @@
                     <p style="color: var(--muted); max-width: 600px; margin: 0 auto;">Combinez plusieurs formations pour maximiser vos compétences tout en réalisant des économies substantielles.</p>
                 </div>
 
-                <div class="training-group-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); justify-content: center; gap: 24px; max-width: 960px; margin: 0 auto;">
+                <div class="training-group-grid packs-grid">
                     @forelse($bundles as $bundle)
                         <div class="training-card bundle-card">
                             <div class="training-image" style="background-image: url('{{ $bundle['illustration'] ?? asset('assets/images/default-training.svg') }}');">
