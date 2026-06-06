@@ -279,21 +279,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
 
-                // Adjust group headers
+                // Adjust group headers and cards containers
                 groups.forEach(group => {
-                    const totalGroupCards = group.querySelectorAll('.training-card');
-                    let hasVisible = false;
-                    
-                    totalGroupCards.forEach(c => {
-                        if (c.style.display !== 'none') {
-                            hasVisible = true;
-                        }
-                    });
+                    const cardsContainer = group.nextElementSibling;
+                    if (cardsContainer && cardsContainer.classList.contains('training-cards-scroll')) {
+                        const totalGroupCards = cardsContainer.querySelectorAll('.training-card');
+                        let hasVisible = false;
+                        
+                        totalGroupCards.forEach(c => {
+                            if (c.style.display !== 'none') {
+                                hasVisible = true;
+                            }
+                        });
 
-                    if (hasVisible) {
-                        group.style.display = '';
-                    } else {
-                        group.style.display = 'none';
+                        if (hasVisible) {
+                            group.style.display = '';
+                            cardsContainer.style.display = '';
+                        } else {
+                            group.style.display = 'none';
+                            cardsContainer.style.display = 'none';
+                        }
                     }
                 });
                 

@@ -233,6 +233,7 @@
 
                 <div class="training-groups">
                     @foreach($trainingGroups as $group)
+                        {{-- Titre seul dans son bloc --}}
                         <article class="training-group">
                             <div class="training-group-head">
                                 <div class="training-group-copy">
@@ -240,60 +241,62 @@
                                     <p>{{ $group['description'] }}</p>
                                 </div>
                             </div>
-                            <div class="training-group-grid">
-                                @foreach($trainings->where('group', $group['key']) as $training)
-                                    <div class="training-card" data-month="{{ $training['planned_month'] }}">
-                                        <div class="training-image" style="background-image: url('{{ $training['illustration'] }}');">
-                                            <div class="training-image-badges">
-                                                <span class="package-chip">{{ $training['tag'] }}</span>
-                                            </div>
-                                            <div class="price-badge">
-                                                @if($training['promo_price'] > 0)
-                                                    <span class="package-price-old">{{ number_format($training['price'], 0, ',', ' ') }} CFA</span>
-                                                @endif
-                                                <strong class="package-price-current">{{ number_format($training['promo_price'] ?: $training['price'], 0, ',', ' ') }} CFA</strong>
-                                            </div>
+                        </article>
+
+                        {{-- Cartes en dehors du bloc, directement sur la page --}}
+                        <div class="training-cards-scroll">
+                            @foreach($trainings->where('group', $group['key']) as $training)
+                                <div class="training-card" data-month="{{ $training['planned_month'] }}">
+                                    <div class="training-image" style="background-image: url('{{ $training['illustration'] }}');">
+                                        <div class="training-image-badges">
+                                            <span class="package-chip">{{ $training['tag'] }}</span>
                                         </div>
-                                        <div class="training-content">
-                                            <div class="training-location">
-                                                <span class="training-location-icon">
-                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                                                </span>
-                                                {{ $training['location'] ?: 'En ligne' }}
-                                            </div>
-                                            <h3>{{ $training['name'] }}</h3>
-                                            <p class="package-description">{{ Str::limit($training['description'], 80) }}</p>
-
-                                            {{-- Skills tags --}}
-                                            @if($training['skills']->isNotEmpty())
-                                            <div class="training-skills-strip">
-                                                @foreach($training['skills'] as $skill)
-                                                    <span class="training-skill-tag" style="background-color:{{ $skill->badge_color }};">{{ $skill->name }}</span>
-                                                @endforeach
-                                            </div>
+                                        <div class="price-badge">
+                                            @if($training['promo_price'] > 0)
+                                                <span class="package-price-old">{{ number_format($training['price'], 0, ',', ' ') }} CFA</span>
                                             @endif
-
-                                            <div class="training-card-sep"></div>
-
-                                            <div class="training-action-row">
-                                                <span class="training-date">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                                    {{ $training['date'] }}
-                                                </span>
-                                                <a href="{{ route('training.show', $training['id']) }}" class="btn btn-primary btn-compact">Détails</a>
-                                            </div>
-
-                                            <div class="training-remaining">
-                                                <span class="training-remaining-icon">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                                </span>
-                                                {{ $training['available'] }} places disponibles
-                                            </div>
+                                            <strong class="package-price-current">{{ number_format($training['promo_price'] ?: $training['price'], 0, ',', ' ') }} CFA</strong>
                                         </div>
                                     </div>
-                                @endforeach
-                            </div>
-                        </article>
+                                    <div class="training-content">
+                                        <div class="training-location">
+                                            <span class="training-location-icon">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            </span>
+                                            {{ $training['location'] ?: 'En ligne' }}
+                                        </div>
+                                        <h3>{{ $training['name'] }}</h3>
+                                        <p class="package-description">{{ Str::limit($training['description'], 80) }}</p>
+
+                                        {{-- Skills tags --}}
+                                        @if($training['skills']->isNotEmpty())
+                                        <div class="training-skills-strip">
+                                            @foreach($training['skills'] as $skill)
+                                                <span class="training-skill-tag" style="background-color:{{ $skill->badge_color }};">{{ $skill->name }}</span>
+                                            @endforeach
+                                        </div>
+                                        @endif
+
+                                        <div class="training-card-sep"></div>
+
+                                        <div class="training-action-row">
+                                            <span class="training-date">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                                {{ $training['date'] }}
+                                            </span>
+                                            <a href="{{ route('training.show', $training['id']) }}" class="btn btn-primary btn-compact">Détails</a>
+                                        </div>
+
+                                        <div class="training-remaining">
+                                            <span class="training-remaining-icon">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                            </span>
+                                            {{ $training['available'] }} places disponibles
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     @endforeach
                 </div>
             </div>

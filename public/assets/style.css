@@ -1009,11 +1009,13 @@ img {
     align-self: center;
 }
 
-.training-group-grid {
+.training-group-grid,
+.training-cards-scroll {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 250px));
     justify-content: start;
     gap: 18px;
+    margin-bottom: 24px;
 }
 
 /* Desktop: Packs grid centered with wider cards */
@@ -2046,7 +2048,8 @@ img {
     }
 
     /* Mobile Horizontally Scrollable Formations & Packs */
-    .training-group-grid {
+    .training-group-grid,
+    .training-cards-scroll {
         display: flex !important;
         flex-wrap: nowrap !important;
         grid-template-columns: none !important;
@@ -2064,11 +2067,13 @@ img {
         scrollbar-width: none !important;
     }
 
-    .training-group-grid::-webkit-scrollbar {
+    .training-group-grid::-webkit-scrollbar,
+    .training-cards-scroll::-webkit-scrollbar {
         display: none;
     }
 
-    .training-group-grid .training-card {
+    .training-group-grid .training-card,
+    .training-cards-scroll .training-card {
         flex: 0 0 260px !important;
         max-width: 260px !important;
         min-width: 260px !important;
