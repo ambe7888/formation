@@ -79,6 +79,45 @@ function loadTrainingsFromDb(): array
     return $trainings;
 }
 
+function loadBundlesFromDb(): array
+{
+    try {
+        $pdo = getDbConnection();
+        $stmt = $pdo->query('SELECT id, name, price, description FROM bundles ORDER BY name ASC');
+        $rows = $stmt->fetchAll();
+        
+        if (!$rows) {
+            return [];
+        }
+        
+        $bundles = [];
+        foreach ($rows as $row) {
+            $bundleId = (int) $row['id'];
+            
+            // Fetch associated active trainings
+            $tStmt = $pdo->prepare('
+                SELECT t.id, t.title 
+                FROM trainings t
+                INNER JOIN bundle_training bt ON t.id = bt.training_id
+                WHERE bt.bundle_id = ? AND t.is_active = 1
+            ');
+            $tStmt->execute([$bundleId]);
+            $trainings = $tStmt->fetchAll();
+            
+            $bundles[] = [
+                'id' => $bundleId,
+                'name' => (string) $row['name'],
+                'price' => (int) $row['price'],
+                'description' => (string) $row['description'],
+                'trainings' => $trainings,
+            ];
+        }
+        return $bundles;
+    } catch (Throwable $e) {
+        return [];
+    }
+}
+
 function buildTrainingGroups(array $trainings, array $descriptions): array
 {
     $groups = [];
@@ -408,6 +447,10 @@ $statusClassMap = [
     'Ouvertes' => 'ouvertes',
     'À venir' => 'a-venir',
 ];
+$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if (!str_ends_with(strtolower($basePath), 'public')) {
+    $basePath = rtrim($basePath, '/\\') . '/public';
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -481,7 +524,20 @@ $statusClassMap = [
                                             <p class="package-description"><?php echo htmlspecialchars(excerptWords($package['description'], 20)); ?></p>
                                              <div class="package-action-row">
                                                  <span class="package-date"><span class="package-icon-cal">📅</span> <?php echo htmlspecialchars($package['date']); ?></span>
-                                                 <a class="btn btn-dark package-action" href="#inscription" data-course="<?php echo htmlspecialchars($package['name']); ?>">S'inscrire</a>
+                                                 <?php 
+                                                 $targetId = null;
+                                                 foreach ($availableTrainings as $t) {
+                                                     if (strcasecmp($t['name'], $package['name']) === 0) {
+                                                         $targetId = $t['id'];
+                                                         break;
+                                                     }
+                                                 }
+                                                 ?>
+                                                 <?php if ($targetId): ?>
+                                                     <a class="btn btn-dark package-action" href="<?php echo htmlspecialchars($basePath . '/formations/' . $targetId); ?>">Détails</a>
+                                                 <?php else: ?>
+                                                     <a class="btn btn-dark package-action" href="#inscription" data-course="<?php echo htmlspecialchars($package['name']); ?>">S'inscrire</a>
+                                                 <?php endif; ?>
                                              </div>
                                             <div class="package-remaining">👥 <?php echo $package['available']; ?> places disponibles</div>
                                         </div>
@@ -506,6 +562,58 @@ $statusClassMap = [
                     <h2>Programmes disponibles ce mois-ci</h2>
                     <p>Choisissez votre catégorie et découvrez les formations associées.</p>
                 </div>
+
+                <?php
+                $dbBundles = loadBundlesFromDb();
+                if (!empty($dbBundles)):
+                ?>
+                    <!-- Section Nos Packs de formation -->
+                    <div class="category-header-block reveal" style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; margin-bottom: 2rem;">
+                        <div class="category-header-inner">
+                            <div class="category-header-copy">
+                                <span class="eyebrow" style="color: #7e22ce;">Économie & Offres exclusives</span>
+                                <h3>Nos Packs de formation</h3>
+                                <p>Bénéficiez de nos meilleurs programmes regroupés dans des offres exclusives à tarifs réduits.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="category-cards-grid reveal" style="margin-bottom: 4rem;">
+                        <?php foreach ($dbBundles as $bundle): ?>
+                            <article class="training-card" style="border: 2px solid #ddd6fe; box-shadow: 0 10px 25px rgba(126, 34, 206, 0.05);">
+                                <div class="training-image" style="background: linear-gradient(135deg, #7e22ce 0%, #4f46e5 100%); height: 180px; position: relative;">
+                                    <div class="training-image-badges" style="position: absolute; top: 1rem; left: 1rem;">
+                                        <span class="package-chip" style="background: #ffffff; color: #7e22ce; font-weight: 800;">PACK EXCLUSIF</span>
+                                    </div>
+                                    <div class="price-badge" style="background: #ffffff; color: #7e22ce; border: 1px solid #c084fc; padding: 0.5rem 1rem; border-radius: 0.75rem; position: absolute; bottom: 1rem; right: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                                        <strong class="package-price-current" style="color: #7e22ce; font-size: 1.2rem; font-weight: 800;"><?php echo number_format($bundle['price'], 0, ',', ' '); ?> CFA</strong>
+                                    </div>
+                                </div>
+                                <div class="training-content" style="padding: 1.5rem;">
+                                    <h3 style="font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 900; margin: 0 0 1rem 0; color: #0f172a;">🎁 <?php echo htmlspecialchars($bundle['name']); ?></h3>
+                                    <p style="font-size: 0.95rem; color: #4b5563; line-height: 1.6; margin-bottom: 1.25rem;"><?php echo htmlspecialchars($bundle['description']); ?></p>
+                                    
+                                    <p style="font-weight: 700; color: #7e22ce; margin-bottom: 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.03em;">📚 Formations incluses :</p>
+                                    <ul style="padding-left: 1.2rem; margin: 0 0 1.5rem 0; font-size: 0.9rem; color: #374151; line-height: 1.5;">
+                                        <?php foreach ($bundle['trainings'] as $bt): ?>
+                                            <li><strong><?php echo htmlspecialchars($bt['title']); ?></strong></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                    
+                                    <div class="training-action-row" style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
+                                        <span style="font-size: 0.8rem; color: #7e22ce; font-weight: bold;">🔥 Offre limitée</span>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <a class="btn btn-dark btn-compact" href="<?php echo htmlspecialchars($basePath . '/packs/' . $bundle['id']); ?>" style="text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; padding: 0.5rem 1rem; border-radius: 0.5rem;">Détails</a>
+                                            <button class="btn btn-dark btn-compact" onclick="selectBundleForSignup(<?php echo $bundle['id']; ?>, '<?php echo htmlspecialchars($bundle['name']); ?>')" style="background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%); color: #fff; border: none; font-weight: 700; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s ease;">
+                                                S'inscrire
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
 
                 <?php
                 $allFacts = [
@@ -568,10 +676,10 @@ $statusClassMap = [
                                     </div>
                                     <h3><?php echo htmlspecialchars($training['name']); ?></h3>
                                     <p><?php echo htmlspecialchars(excerptWords($training['description'], 14)); ?></p>
-                                    <div class="training-action-row">
-                                        <span class="training-date">📅 <?php echo htmlspecialchars($training['date']); ?></span>
-                                        <a class="btn btn-dark btn-compact" href="#inscription" data-course="<?php echo htmlspecialchars($training['name']); ?>">S'inscrire</a>
-                                    </div>
+                                     <div class="training-action-row">
+                                         <span class="training-date">📅 <?php echo htmlspecialchars($training['date']); ?></span>
+                                         <a class="btn btn-dark btn-compact" href="<?php echo htmlspecialchars($basePath . '/formations/' . $training['id']); ?>">Détails</a>
+                                     </div>
                                     <div class="training-remaining">👥 <?php echo $training['available']; ?> places disponibles</div>
                                 </div>
                             </article>
@@ -602,60 +710,117 @@ $statusClassMap = [
                         <p>Deux formations séparées coûtent 30 000. Le pack IA + Marketing coûte 25 000.</p>
                     </div>
                 </div>
-                <form class="signup-form" action="register.php" method="post">
-                    <?php if ($status === 'success'): ?>
-                        <div class="alert alert-success">Inscription enregistrée avec succès.</div>
-                    <?php elseif ($status === 'error'): ?>
-                        <div class="alert alert-error">Veuillez remplir tous les champs obligatoires.</div>
-                    <?php endif; ?>
-                    <label>
-                        Nom complet
-                        <input type="text" name="name" placeholder="Votre nom" required>
-                    </label>
-                    <label>
-                        Téléphone
-                        <input type="text" name="phone" placeholder="Votre numéro" required>
-                    </label>
-                    <label>
-                        Email
-                        <input type="email" name="email" placeholder="Votre email" required>
-                    </label>
-                    <label>
-                        Formation souhaitée
-                        <select name="course" id="courseSelect" required>
-                            <option value="">Choisir une formation</option>
-                            <?php
-                            $courseOptions = [];
-                            foreach ($availableTrainings as $training) {
-                                $courseOptions[$training['name']] = $training['price'];
+                <?php if ($status === 'success'): ?>
+                    <div class="thank-you-card animate-fade-in" style="background: #ffffff; border-radius: 1.5rem; border: 2px solid #10b981; box-shadow: 0 20px 40px rgba(16, 185, 129, 0.08); padding: 3rem; text-align: center; max-width: 500px; margin: 0 auto; box-sizing: border-box; width: 100%;">
+                        <span style="font-size: 4.5rem; display: block; margin-bottom: 1.5rem;">🎉</span>
+                        <h3 style="color: #10b981; font-size: 1.6rem; font-weight: 800; margin: 0 0 1rem 0;">Merci pour votre inscription !</h3>
+                        <p style="font-size: 1.05rem; line-height: 1.6; color: #334155; margin-bottom: 2rem;">
+                            Votre demande pour <strong><?php echo htmlspecialchars($selectedCourse); ?></strong> a bien été enregistrée et transmise avec succès.
+                        </p>
+                        <div style="background: #f0fdf4; border-radius: 1rem; padding: 1.25rem; margin-bottom: 2rem; border: 1px solid #bbf7d0; text-align: left;">
+                            <p style="margin: 0 0 0.5rem 0; font-size: 0.95rem; color: #166534;"><strong>Prochaines étapes :</strong></p>
+                            <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: #166534; line-height: 1.5;">
+                                <li>Notre équipe pédagogique va valider votre dossier sous 24h.</li>
+                                <li>Rendez-vous dans votre <strong>Espace Étudiant</strong> pour déclarer vos versements de paiement.</li>
+                                <li>Dès validation, vos accès aux supports de cours 🔒 seront débloqués.</li>
+                            </ul>
+                        </div>
+                        <a href="<?php echo htmlspecialchars($basePath . '/login'); ?>" class="btn btn-primary btn-full" style="text-decoration: none; display: block; text-align: center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; color: white;">
+                            Accéder à mon Espace Étudiant 🧑‍🎓
+                        </a>
+                    </div>
+                <?php else: ?>
+                    <form class="signup-form" action="register.php" method="post">
+                        <?php if ($status === 'error'): ?>
+                            <div class="alert alert-error">Veuillez remplir tous les champs obligatoires.</div>
+                        <?php elseif ($status === 'duplicate'): ?>
+                            <div class="alert alert-error" style="background-color: #fee2e2; border-color: #fca5a5; color: #991b1b;">Vous êtes déjà inscrit(e) à cette formation ou ce pack !</div>
+                        <?php endif; ?>
+                        <input type="hidden" name="bundle_id" id="home_bundle_id" value="">
+                        <label>
+                            Nom complet
+                            <input type="text" name="name" placeholder="Votre nom" required>
+                        </label>
+                        <label>
+                            Téléphone
+                            <input type="text" name="phone" placeholder="Votre numéro" required>
+                        </label>
+                        <label>
+                            Email
+                            <input type="email" name="email" placeholder="Votre email" required>
+                        </label>
+                        <label>
+                            Formation souhaitée
+                            <select name="course" id="courseSelect" required>
+                                <option value="">Choisir une formation</option>
+                                <?php
+                                $courseOptions = [];
+                                foreach ($availableTrainings as $training) {
+                                    $courseOptions[$training['name']] = $training['price'];
+                                }
+                                foreach ($specialPackages as $package) {
+                                    $courseOptions[$package['name']] = $package['price'];
+                                }
+                                ?>
+                                <?php foreach ($courseOptions as $courseName => $coursePrice): ?>
+                                    <option value="<?php echo htmlspecialchars($courseName); ?>" <?php echo $selectedCourse === $courseName ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($courseName); ?> - <?php echo number_format((int) $coursePrice, 0, ',', ' '); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                        <label>
+                            Mois
+                            <select name="month" required>
+                                <option value="">Choisir un mois</option>
+                                <?php foreach ($trainingMonths as $month): ?>
+                                    <option value="<?php echo htmlspecialchars($month['month']); ?>"><?php echo htmlspecialchars($month['month']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                        <label>
+                            Message
+                            <textarea name="message" rows="4" placeholder="Dites-nous si vous voulez la session IA, Marketing ou le pack."></textarea>
+                        </label>
+                        <button class="btn btn-primary btn-full" type="submit">Envoyer l’inscription</button>
+                        <p class="form-note">Les champs marqués sont obligatoires. Le pack est sélectionnable directement dans le formulaire.</p>
+                    </form>
+                <?php endif; ?>
+
+                <script>
+                    function selectBundleForSignup(bundleId, bundleName) {
+                        const courseSelect = document.getElementById('courseSelect');
+                        const bundleInput = document.getElementById('home_bundle_id');
+                        
+                        if (bundleInput) {
+                            bundleInput.value = bundleId;
+                        }
+                        
+                        if (courseSelect) {
+                            let exists = false;
+                            for (let i = 0; i < courseSelect.options.length; i++) {
+                                if (courseSelect.options[i].value === bundleName) {
+                                    exists = true;
+                                    courseSelect.selectedIndex = i;
+                                    break;
+                                }
                             }
-                            foreach ($specialPackages as $package) {
-                                $courseOptions[$package['name']] = $package['price'];
+                            
+                            if (!exists) {
+                                const opt = document.createElement('option');
+                                opt.value = bundleName;
+                                opt.text = bundleName;
+                                courseSelect.add(opt);
+                                courseSelect.value = bundleName;
                             }
-                            ?>
-                            <?php foreach ($courseOptions as $courseName => $coursePrice): ?>
-                                <option value="<?php echo htmlspecialchars($courseName); ?>" <?php echo $selectedCourse === $courseName ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($courseName); ?> - <?php echo number_format((int) $coursePrice, 0, ',', ' '); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
-                    <label>
-                        Mois
-                        <select name="month" required>
-                            <option value="">Choisir un mois</option>
-                            <?php foreach ($trainingMonths as $month): ?>
-                                <option value="<?php echo htmlspecialchars($month['month']); ?>"><?php echo htmlspecialchars($month['month']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
-                    <label>
-                        Message
-                        <textarea name="message" rows="4" placeholder="Dites-nous si vous voulez la session IA, Marketing ou le pack."></textarea>
-                    </label>
-                    <button class="btn btn-primary btn-full" type="submit">Envoyer l’inscription</button>
-                    <p class="form-note">Les champs marqués sont obligatoires. Le pack est sélectionnable directement dans le formulaire.</p>
-                </form>
+                        }
+                        
+                        const target = document.getElementById('inscription');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                </script>
             </div>
         </section>
     </main>

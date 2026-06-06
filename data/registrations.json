@@ -1,0 +1,11 @@
+[
+    {
+        "name": "Jean Dupont",
+        "phone": "0612345678",
+        "email": "jean.dupont@example.com",
+        "course": "Formation IA",
+        "month": "Juin",
+        "message": "Test inscription automatique.",
+        "created_at": "2026-05-03T22:48:59+02:00"
+    }
+]
