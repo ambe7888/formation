@@ -2048,10 +2048,13 @@ img {
     /* Mobile Horizontally Scrollable Formations & Packs */
     .training-group-grid {
         display: flex !important;
+        flex-wrap: nowrap !important;
         grid-template-columns: none !important;
         overflow-x: auto !important;
+        overflow-y: hidden !important;
         scroll-snap-type: x mandatory !important;
         -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-x !important;
         gap: 14px !important;
         padding: 4px 16px 16px !important;
         margin-left: -16px !important;
@@ -2069,6 +2072,7 @@ img {
         flex: 0 0 260px !important;
         max-width: 260px !important;
         min-width: 260px !important;
+        flex-shrink: 0 !important;
         scroll-snap-align: start !important;
         margin: 0 !important;
     }
