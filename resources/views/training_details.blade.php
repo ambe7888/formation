@@ -417,36 +417,40 @@
                     @endforelse
                 </div>
 
-                <!-- Pack offers (if any) -->
-                @if($training->bundles->isNotEmpty())
-                    <h2 class="section-title" style="margin-top: 3rem;">📦 Packs promotionnels disponibles</h2>
-                    <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
-                        Cette formation fait partie de packs d'accompagnement complets à tarifs préférentiels. Profitez-en pour vous former sur l'ensemble du cursus :
-                    </p>
-                    @foreach($training->bundles as $bundle)
-                        <div class="alert-premium" style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; color: #581c87; margin-bottom: 1.5rem; border-radius: 1.5rem; padding: 1.5rem;">
-                            <strong style="color: #7e22ce; font-size: 1.15rem; display: block; margin-bottom: 0.5rem;">💡 Offre Spéciale : Pack "{{ $bundle->name }}"</strong>
-                            Ce pack regroupe les formations suivantes :
-                            <ul style="margin: 0.75rem 0; padding-left: 1.5rem; font-size: 0.95rem; line-height: 1.6;">
-                                @foreach($bundle->trainings as $bt)
-                                    <li style="margin-bottom: 0.25rem;">
-                                        <strong style="color: #6b21a8;">{{ $bt->title }}</strong>
-                                    </li>
-                                @endforeach
-                            </ul>
-                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.25rem; border-top: 1px dashed rgba(192, 132, 252, 0.5); padding-top: 1.25rem;">
-                                <div>
-                                    <span style="font-size: 0.9rem; color: #6b21a8; display: block;">Tarif du pack complet :</span>
-                                    <strong style="font-size: 1.5rem; color: #7e22ce;">{{ number_format($bundle->price, 0, ',', ' ') }} CFA</strong>
-                                    <span style="font-size: 0.85rem; text-decoration: line-through; color: #94a3b8; margin-left: 0.5rem;">{{ number_format($bundle->trainings->sum('price'), 0, ',', ' ') }} CFA</span>
+                <!-- Pack offers details (only if more than 1 pack) -->
+                @if($training->bundles->count() > 1)
+                    <div id="packs-section" style="margin-top: 3rem; scroll-margin-top: 8rem;">
+                        <h2 class="section-title">📦 Packs promotionnels disponibles</h2>
+                        <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                            Cette formation fait partie de plusieurs packs d'accompagnement complets à tarifs préférentiels. Profitez-en pour vous former sur l'ensemble du cursus :
+                        </p>
+                        @foreach($training->bundles as $bundle)
+                            <div class="alert-premium" style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; color: #581c87; margin-bottom: 1.5rem; border-radius: 1.5rem; padding: 1.5rem;">
+                                <strong style="color: #7e22ce; font-size: 1.15rem; display: block; margin-bottom: 0.5rem;">💡 Offre Spéciale : Pack "{{ $bundle->name }}"</strong>
+                                Ce pack regroupe les formations suivantes :
+                                <ul style="margin: 0.75rem 0; padding-left: 1.5rem; font-size: 0.95rem; line-height: 1.6;">
+                                    @foreach($bundle->trainings as $bt)
+                                        <li style="margin-bottom: 0.25rem;">
+                                            <strong style="color: #6b21a8;">{{ $bt->title }}</strong>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.25rem; border-top: 1px dashed rgba(192, 132, 252, 0.5); padding-top: 1.25rem;">
+                                    <div>
+                                        <span style="font-size: 0.9rem; color: #6b21a8; display: block;">Tarif du pack complet :</span>
+                                        <strong style="font-size: 1.5rem; color: #7e22ce;">{{ number_format($bundle->price, 0, ',', ' ') }} CFA</strong>
+                                        <span style="font-size: 0.85rem; text-decoration: line-through; color: #94a3b8; margin-left: 0.5rem;">{{ number_format($bundle->trainings->sum('price'), 0, ',', ' ') }} CFA</span>
+                                    </div>
+                                    <button type="button" class="btn-submit-premium" style="background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%); font-size: 0.95rem; padding: 0.75rem 1.5rem; width: auto; box-shadow: 0 4px 12px rgba(126, 34, 206, 0.2);" onclick="enrollInBundle({{ $bundle->id }}, '{{ $bundle->name }}')">
+                                        S'inscrire au Pack complet 🚀
+                                    </button>
                                 </div>
-                                <button type="button" class="btn-submit-premium" style="background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%); font-size: 0.95rem; padding: 0.75rem 1.5rem; width: auto; box-shadow: 0 4px 12px rgba(126, 34, 206, 0.2);" onclick="enrollInBundle({{ $bundle->id }}, '{{ $bundle->name }}')">
-                                    S'inscrire au Pack complet 🚀
-                                </button>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
+                @endif
 
+                @if($training->bundles->isNotEmpty())
                     <script>
                         function enrollInBundle(bundleId, bundleName) {
                             const bundleInput = document.getElementById('main_bundle_id');
@@ -518,6 +522,36 @@
                         </span>
                     </li>
                 </ul>
+
+                <!-- Bundle Promo Alert Banner in Sidebar -->
+                @if($training->bundles->count() == 1)
+                    @foreach($training->bundles as $bundle)
+                        <div class="alert-premium" style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; color: #581c87; margin-bottom: 1.5rem; border-radius: 1rem; padding: 1.25rem;">
+                            <strong style="color: #7e22ce; font-size: 1rem; display: block; margin-bottom: 0.5rem;">💡 Offre Spéciale Pack !</strong>
+                            Cette formation fait partie du pack premium <strong>"{{ $bundle->name }}"</strong> qui regroupe :
+                            <ul style="margin: 0.5rem 0; padding-left: 1.2rem; font-size: 0.85rem;">
+                                @foreach($bundle->trainings as $bt)
+                                    <li>{{ $bt->title }}</li>
+                                @endforeach
+                            </ul>
+                            Bénéficiez du pack complet pour seulement 
+                            <strong style="font-size: 1.2rem; color: #7e22ce;">{{ number_format($bundle->price, 0, ',', ' ') }} CFA</strong> 
+                            au lieu de ~~{{ number_format($bundle->trainings->sum('price'), 0, ',', ' ') }} CFA~~ !
+                            
+                            <button type="button" class="btn-submit-premium mt-3" style="background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%); font-size: 0.95rem; padding: 0.75rem; box-shadow: 0 4px 12px rgba(126, 34, 206, 0.2);" onclick="enrollInBundle({{ $bundle->id }}, '{{ $bundle->name }}')">
+                                S'inscrire au Pack complet 🚀
+                            </button>
+                        </div>
+                    @endforeach
+                @elseif($training->bundles->count() > 1)
+                    <!-- Multiple packs alert box pointing to #packs-section anchor -->
+                    <div style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; color: #581c87; margin-bottom: 1.5rem; border-radius: 1rem; padding: 1.25rem; text-align: center;">
+                        <span style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;">🎁</span>
+                        <strong style="color: #7e22ce; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">{{ $training->bundles->count() }} Offres Packs Disponibles</strong>
+                        <p style="font-size: 0.85rem; margin: 0 0 1rem; line-height: 1.4; color: #6b21a8;">Cette formation fait partie de plusieurs packs avec des réductions exceptionnelles.</p>
+                        <a href="#packs-section" style="text-decoration: none; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%); color: #fff; border-radius: 0.75rem; padding: 0.6rem 1rem; font-weight: 700; font-size: 0.85rem; box-shadow: 0 4px 10px rgba(126,34,206,0.2); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">Voir les packs associés</a>
+                    </div>
+                @endif
 
                 @if(request('status') === 'success')
                     <div class="thank-you-card" style="text-align: center; padding: 2rem; background: #ffffff; border-radius: 1.5rem; border: 2px solid #10b981; box-shadow: 0 20px 40px rgba(16, 185, 129, 0.08); width: 100%; box-sizing: border-box;">
