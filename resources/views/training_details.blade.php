@@ -417,75 +417,7 @@
                     @endforelse
                 </div>
 
-                <!-- Pack offers details (only if more than 1 pack) -->
-                @if($training->bundles->count() > 1)
-                    <div id="packs-section" style="margin-top: 3rem; scroll-margin-top: 8rem;">
-                        <h2 class="section-title">📦 Packs promotionnels disponibles</h2>
-                        <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
-                            Cette formation fait partie de plusieurs packs d'accompagnement complets à tarifs préférentiels. Profitez-en pour vous former sur l'ensemble du cursus :
-                        </p>
-                        @foreach($training->bundles as $bundle)
-                            <div class="alert-premium" style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; color: #581c87; margin-bottom: 1.5rem; border-radius: 1.5rem; padding: 1.5rem;">
-                                <strong style="color: #7e22ce; font-size: 1.15rem; display: block; margin-bottom: 0.5rem;">💡 Offre Spéciale : Pack "{{ $bundle->name }}"</strong>
-                                Ce pack regroupe les formations suivantes :
-                                <ul style="margin: 0.75rem 0; padding-left: 1.5rem; font-size: 0.95rem; line-height: 1.6;">
-                                    @foreach($bundle->trainings as $bt)
-                                        <li style="margin-bottom: 0.25rem;">
-                                            <strong style="color: #6b21a8;">{{ $bt->title }}</strong>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.25rem; border-top: 1px dashed rgba(192, 132, 252, 0.5); padding-top: 1.25rem;">
-                                    <div>
-                                        <span style="font-size: 0.9rem; color: #6b21a8; display: block;">Tarif du pack complet :</span>
-                                        <strong style="font-size: 1.5rem; color: #7e22ce;">{{ number_format($bundle->price, 0, ',', ' ') }} CFA</strong>
-                                        <span style="font-size: 0.85rem; text-decoration: line-through; color: #94a3b8; margin-left: 0.5rem;">{{ number_format($bundle->trainings->sum('price'), 0, ',', ' ') }} CFA</span>
-                                    </div>
-                                    <button type="button" class="btn-submit-premium" style="background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%); font-size: 0.95rem; padding: 0.75rem 1.5rem; width: auto; box-shadow: 0 4px 12px rgba(126, 34, 206, 0.2);" onclick="enrollInBundle({{ $bundle->id }}, '{{ $bundle->name }}')">
-                                        S'inscrire au Pack complet 🚀
-                                    </button>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
 
-                @if($training->bundles->isNotEmpty())
-                    <script>
-                        function enrollInBundle(bundleId, bundleName) {
-                            const bundleInput = document.getElementById('main_bundle_id');
-                            if (bundleInput) {
-                                bundleInput.value = bundleId;
-                            }
-                            
-                            // Update display name
-                            const courseLabel = document.getElementById('selected_course_label');
-                            if (courseLabel) {
-                                courseLabel.value = "Pack " + bundleName;
-                            }
-                            
-                            const courseInput = document.getElementById('main_course_input');
-                            if (courseInput) {
-                                courseInput.value = bundleName;
-                            }
-
-                            @auth('client')
-                                // Connected student: submit the form in 1-click!
-                                const form = document.getElementById('main_registration_form');
-                                if (form) {
-                                    form.submit();
-                                }
-                            @else
-                                // Unauthenticated visitor: focus fields to register
-                                const nameField = document.getElementById('name');
-                                if (nameField) {
-                                    nameField.focus();
-                                }
-                                alert("Offre activée : Pack " + bundleName + " ! Veuillez remplir vos coordonnées et choisir un mot de passe ci-dessous pour valider votre inscription au pack complet.");
-                            @endauth
-                        }
-                    </script>
-                @endif
             </div>
         </article>
 
@@ -522,36 +454,6 @@
                         </span>
                     </li>
                 </ul>
-
-                <!-- Bundle Promo Alert Banner in Sidebar -->
-                @if($training->bundles->count() == 1)
-                    @foreach($training->bundles as $bundle)
-                        <div class="alert-premium" style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; color: #581c87; margin-bottom: 1.5rem; border-radius: 1rem; padding: 1.25rem;">
-                            <strong style="color: #7e22ce; font-size: 1rem; display: block; margin-bottom: 0.5rem;">💡 Offre Spéciale Pack !</strong>
-                            Cette formation fait partie du pack premium <strong>"{{ $bundle->name }}"</strong> qui regroupe :
-                            <ul style="margin: 0.5rem 0; padding-left: 1.2rem; font-size: 0.85rem;">
-                                @foreach($bundle->trainings as $bt)
-                                    <li>{{ $bt->title }}</li>
-                                @endforeach
-                            </ul>
-                            Bénéficiez du pack complet pour seulement 
-                            <strong style="font-size: 1.2rem; color: #7e22ce;">{{ number_format($bundle->price, 0, ',', ' ') }} CFA</strong> 
-                            au lieu de ~~{{ number_format($bundle->trainings->sum('price'), 0, ',', ' ') }} CFA~~ !
-                            
-                            <button type="button" class="btn-submit-premium mt-3" style="background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%); font-size: 0.95rem; padding: 0.75rem; box-shadow: 0 4px 12px rgba(126, 34, 206, 0.2);" onclick="enrollInBundle({{ $bundle->id }}, '{{ $bundle->name }}')">
-                                S'inscrire au Pack complet 🚀
-                            </button>
-                        </div>
-                    @endforeach
-                @elseif($training->bundles->count() > 1)
-                    <!-- Multiple packs alert box pointing to #packs-section anchor -->
-                    <div style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; color: #581c87; margin-bottom: 1.5rem; border-radius: 1rem; padding: 1.25rem; text-align: center;">
-                        <span style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;">🎁</span>
-                        <strong style="color: #7e22ce; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">{{ $training->bundles->count() }} Offres Packs Disponibles</strong>
-                        <p style="font-size: 0.85rem; margin: 0 0 1rem; line-height: 1.4; color: #6b21a8;">Cette formation fait partie de plusieurs packs avec des réductions exceptionnelles.</p>
-                        <a href="#packs-section" style="text-decoration: none; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%); color: #fff; border-radius: 0.75rem; padding: 0.6rem 1rem; font-weight: 700; font-size: 0.85rem; box-shadow: 0 4px 10px rgba(126,34,206,0.2); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">Voir les packs associés</a>
-                    </div>
-                @endif
 
                 @if(request('status') === 'success')
                     <div class="thank-you-card" style="text-align: center; padding: 2rem; background: #ffffff; border-radius: 1.5rem; border: 2px solid #10b981; box-shadow: 0 20px 40px rgba(16, 185, 129, 0.08); width: 100%; box-sizing: border-box;">
@@ -599,6 +501,72 @@
                         <input type="hidden" name="course" value="{{ $formattedTraining['name'] }}" id="main_course_input">
                         <!-- Hidden bundle id input -->
                         <input type="hidden" name="bundle_id" value="" id="main_bundle_id">
+
+                        @if($training->bundles->isNotEmpty())
+                            <!-- Pack Promo inside Form -->
+                            <div class="alert-premium" style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; color: #581c87; margin-bottom: 1.25rem; border-radius: 1rem; padding: 1rem;">
+                                <strong style="color: #7e22ce; font-size: 0.9rem; display: block; margin-bottom: 0.4rem;">💡 Offre Pack Spéciale !</strong>
+                                <p style="font-size: 0.8rem; line-height: 1.4; color: #6b21a8; margin: 0 0 0.75rem 0;">
+                                    Cette formation fait partie d'offres packs à tarif préférentiel. Sélectionnez une option :
+                                </p>
+                                
+                                <div class="form-group-custom" style="margin-bottom: 0;">
+                                    <select id="pack_selector" class="form-control-custom" style="font-size: 0.85rem; padding: 0.5rem; font-weight: 700; border: 1px solid #c084fc; background-color: #fff; border-radius: 0.5rem; cursor: pointer; color: #581c87;" onchange="selectPackFromDropdown(this)">
+                                        <option value="">-- Formation seule uniquement --</option>
+                                        @foreach($training->bundles as $bundle)
+                                            <option value="{{ $bundle->id }}" data-name="{{ $bundle->name }}" data-description="{{ Str::limit($bundle->description, 15) }}" data-price="{{ number_format($bundle->price, 0, ',', ' ') }} CFA">
+                                                {{ $bundle->name }} ({{ number_format($bundle->price, 0, ',', ' ') }} CFA)
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Selected Pack Info Box (displays: Title, Description 15 chars, Price) -->
+                                <div id="selected_pack_info_box" style="display: none; margin-top: 0.75rem; border-top: 1px dashed rgba(192, 132, 252, 0.5); padding-top: 0.75rem;">
+                                </div>
+                            </div>
+
+                            <script>
+                                function selectPackFromDropdown(selectElement) {
+                                    const selectedOption = selectElement.options[selectElement.selectedIndex];
+                                    const infoBox = document.getElementById('selected_pack_info_box');
+                                    const bundleInput = document.getElementById('main_bundle_id');
+                                    const courseInput = document.getElementById('main_course_input');
+                                    const courseLabel = document.getElementById('selected_course_label');
+                                    
+                                    if (selectElement.value) {
+                                        const bundleId = selectElement.value;
+                                        const name = selectedOption.getAttribute('data-name');
+                                        const description = selectedOption.getAttribute('data-description');
+                                        const price = selectedOption.getAttribute('data-price');
+                                        
+                                        if (bundleInput) bundleInput.value = bundleId;
+                                        if (courseInput) courseInput.value = name;
+                                        if (courseLabel) courseLabel.value = "Pack " + name;
+                                        
+                                        if (infoBox) {
+                                            infoBox.innerHTML = `
+                                                <div style="font-size: 0.8rem; color: #581c87; line-height: 1.4;">
+                                                    <div style="font-weight: 800; color: #7e22ce;">📦 ${name}</div>
+                                                    <div style="margin-top: 0.2rem; color: #6b21a8;"><strong>Desc:</strong> ${description || 'N/A'}</div>
+                                                    <div style="margin-top: 0.3rem; font-size: 0.9rem; font-weight: 800; color: #7e22ce;">Prix spécial : ${price}</div>
+                                                </div>
+                                            `;
+                                            infoBox.style.display = 'block';
+                                        }
+                                    } else {
+                                        if (bundleInput) bundleInput.value = "";
+                                        if (courseInput) courseInput.value = "{{ $formattedTraining['name'] }}";
+                                        if (courseLabel) courseLabel.value = "{{ $formattedTraining['name'] }}";
+                                        
+                                        if (infoBox) {
+                                            infoBox.innerHTML = '';
+                                            infoBox.style.display = 'none';
+                                        }
+                                    }
+                                }
+                            </script>
+                        @endif
 
                         <div class="form-group-custom">
                             <label>Formation sélectionnée</label>
