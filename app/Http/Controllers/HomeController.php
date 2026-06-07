@@ -367,23 +367,45 @@ class HomeController extends Controller
 
     public function register(Request $request)
     {
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'course' => 'required|string|max:255',
             'month' => 'required|string|max:255',
             'message' => 'nullable|string',
-        ]);
+        ];
 
         if (!auth('client')->check()) {
-            if ($request->has('redirect_to')) {
-                return redirect($request->input('redirect_to'))->with('error', 'Vous devez être connecté pour vous inscrire à une session.');
-            }
-            return redirect()->route('student.login')->with('error', 'Vous devez être connecté pour vous inscrire à une session.');
+            $rules['password'] = 'required|string|min:6';
         }
 
-        $client = auth('client')->user();
+        $request->validate($rules);
+
+        if (auth('client')->check()) {
+            $client = auth('client')->user();
+        } else {
+            // Check if email already exists
+            $emailExists = Client::where('email', $request->input('email'))->exists();
+            if ($emailExists) {
+                $errMsg = 'Cette adresse email est déjà enregistrée. Veuillez vous connecter.';
+                if ($request->has('redirect_to')) {
+                    return redirect($request->input('redirect_to'))->with('error', $errMsg);
+                }
+                return redirect()->route('student.login')->with('error', $errMsg);
+            }
+
+            // Create new Client
+            $client = Client::create([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'phone' => $request->input('phone'),
+                'password' => \Illuminate\Support\Facades\Hash::make($request->input('password')),
+            ]);
+
+            // Log the newly created student in
+            auth('client')->login($client);
+        }
 
         // Intercept Bundle Enrolment
         if ($request->has('bundle_id') && !empty($request->input('bundle_id'))) {
