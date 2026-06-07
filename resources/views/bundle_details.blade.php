@@ -28,41 +28,7 @@
             padding: 0;
         }
 
-        /* Glassmorphic Navigation Header */
-        .details-header {
-            position: sticky;
-            top: 0;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-            z-index: 100;
-            padding: 1rem 0;
-        }
 
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            color: var(--text-dark);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            gap: 0.5rem;
-        }
-
-        .back-btn:hover {
-            color: var(--primary);
-            transform: translateX(-3px);
-        }
 
         /* Hero details banner */
         .training-hero {
@@ -421,25 +387,30 @@
 </head>
 <body>
 
-    <!-- Header / Navigation backlink -->
-    <header class="details-header">
-        <div class="header-container">
-            <a href="{{ url('/') }}" class="back-btn">
-                <span>←</span> Retour à l'accueil
+    <header class="site-header">
+        <div class="container header-bar">
+            <a class="brand" href="{{ url('/') }}">
+                <span class="brand-mark">SB</span>
+                <span>
+                    <strong>Success Business Training</strong>
+                    <small>IA, Business et Marketing </small>
+                </span>
             </a>
-            <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <nav class="nav">
+                <a href="{{ route('trainings.page') }}">Nos formations</a>
+                <a href="{{ route('program.page') }}">Programme</a>
+                <a href="{{ route('skills.page') }}">Compétences</a>
                 @if(auth('client')->check())
-                    <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-dark);">🧑‍🎓 {{ auth('client')->user()->name }}</span>
-                    <a href="{{ route('student.dashboard') }}" style="background: var(--primary); color: #fff; padding: 0.4rem 1rem; border-radius: 0.5rem; font-weight: 700; text-decoration: none; font-size: 0.85rem;">Mon Espace</a>
-                    <form action="{{ route('student.logout') }}" method="POST" style="margin: 0; display: inline;">
+                    <a href="{{ route('student.dashboard') }}" class="btn btn-primary" style="min-height: 38px; padding: 0 16px; font-size: 0.85rem;">Mon Espace 🧑‍🎓</a>
+                    <form action="{{ route('student.logout') }}" method="POST" style="margin: 0; display: inline-flex;">
                         @csrf
-                        <button type="submit" style="background: none; border: none; color: var(--text-main); font: inherit; cursor: pointer; font-weight: 600; padding: 0; font-size: 0.85rem;">Déconnexion</button>
+                        <button type="submit" style="background: none; border: none; color: var(--text); font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-left: 10px;">Déconnexion</button>
                     </form>
                 @else
-                    <a href="{{ route('student.login') }}" style="color: var(--text-dark); text-decoration: none; font-weight: 700; font-size: 0.85rem;">Connexion</a>
-                    <a href="{{ route('student.signup') }}" style="background: var(--dark); color: #fff; padding: 0.4rem 1rem; border-radius: 0.5rem; font-weight: 700; text-decoration: none; font-size: 0.85rem;">Créer un compte</a>
+                    <a href="{{ route('student.login') }}" style="font-size: 0.85rem; font-weight: 700; text-decoration: none;">Connexion</a>
+                    <a href="{{ route('student.signup') }}" class="btn btn-primary" style="min-height: 38px; padding: 0 16px; font-size: 0.85rem;">S'inscrire</a>
                 @endif
-            </div>
+            </nav>
         </div>
     </header>
 
