@@ -323,37 +323,20 @@
 </head>
 <body>
 
-    <header class="site-header">
-        <div class="container header-bar">
-            <a class="brand" href="{{ url('/') }}">
-                <span class="brand-mark">SB</span>
-                <span>
-                    <strong>Success Business Training</strong>
-                    <small>IA, Business et Marketing </small>
-                </span>
-            </a>
-            <nav class="nav">
-                <a href="{{ route('trainings.page') }}">Nos formations</a>
-                <a href="{{ route('program.page') }}">Programme</a>
-                <a href="{{ route('skills.page') }}">Compétences</a>
-                @if(auth('client')->check())
-                    <a href="{{ route('student.dashboard') }}" class="btn btn-primary" style="min-height: 38px; padding: 0 16px; font-size: 0.85rem;">Mon Espace 🧑‍🎓</a>
-                    <form action="{{ route('student.logout') }}" method="POST" style="margin: 0; display: inline-flex;">
-                        @csrf
-                        <button type="submit" style="background: none; border: none; color: var(--text); font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-left: 10px;">Déconnexion</button>
-                    </form>
-                @else
-                    <a href="{{ route('student.login') }}" style="font-size: 0.85rem; font-weight: 700; text-decoration: none;">Connexion</a>
-                    <a href="{{ route('student.signup') }}" class="btn btn-primary" style="min-height: 38px; padding: 0 16px; font-size: 0.85rem;">S'inscrire</a>
-                @endif
-            </nav>
-        </div>
-    </header>
-
     <!-- Hero Banner -->
     <section class="training-hero">
         <div class="hero-container">
-            <span class="hero-tag">{{ $formattedTraining['tag'] }}</span>
+            <!-- Compact, elegant back arrow link -->
+            <a href="{{ url('/') }}" style="display: inline-flex; align-items: center; color: #a5b4fc; text-decoration: none; font-size: 0.85rem; font-weight: 700; margin-bottom: 1.5rem; transition: color 0.2s;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='#a5b4fc'">
+                <svg style="width: 1rem; height: 1rem; margin-right: 0.35rem; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 24 24">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Retour aux formations
+            </a>
+
+            <div>
+                <span class="hero-tag">{{ $formattedTraining['tag'] }}</span>
             <h1 class="hero-title">{{ $formattedTraining['name'] }}</h1>
             <div style="display: flex; gap: 2rem; color: #cbd5e1; font-weight: 600; font-size: 0.95rem;">
                 <span>📅 Début : {{ $formattedTraining['date'] }}</span>
