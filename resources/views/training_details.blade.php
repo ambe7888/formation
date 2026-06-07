@@ -503,66 +503,141 @@
                         <input type="hidden" name="bundle_id" value="" id="main_bundle_id">
 
                         @if($training->bundles->isNotEmpty())
-                            <!-- Pack Promo inside Form -->
-                            <div class="alert-premium" style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; color: #581c87; margin-bottom: 1.25rem; border-radius: 1rem; padding: 1rem;">
-                                <strong style="color: #7e22ce; font-size: 0.9rem; display: block; margin-bottom: 0.4rem;">💡 Offre Pack Spéciale !</strong>
-                                <p style="font-size: 0.8rem; line-height: 1.4; color: #6b21a8; margin: 0 0 0.75rem 0;">
-                                    Cette formation fait partie d'offres packs à tarif préférentiel. Sélectionnez une option :
-                                </p>
+                            <!-- Pack Promo FAQ Accordion inside Form -->
+                            <div class="faq-accordion-container" style="margin-bottom: 1.25rem;">
+                                <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 0.5rem;">Option d'inscription *</label>
                                 
-                                <div class="form-group-custom" style="margin-bottom: 0;">
-                                    <select id="pack_selector" class="form-control-custom" style="font-size: 0.85rem; padding: 0.5rem; font-weight: 700; border: 1px solid #c084fc; background-color: #fff; border-radius: 0.5rem; cursor: pointer; color: #581c87;" onchange="selectPackFromDropdown(this)">
-                                        <option value="">-- Formation seule uniquement --</option>
-                                        @foreach($training->bundles as $bundle)
-                                            <option value="{{ $bundle->id }}" data-name="{{ $bundle->name }}" data-description="{{ Str::limit($bundle->description, 15) }}" data-price="{{ number_format($bundle->price, 0, ',', ' ') }} CFA">
-                                                {{ $bundle->name }} ({{ number_format($bundle->price, 0, ',', ' ') }} CFA)
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                <!-- Option: Single Training -->
+                                <div class="faq-accordion-item active-faq" id="faq_item_single" style="border: 1px solid #7e22ce; border-radius: 0.75rem; background-color: #fff; margin-bottom: 0.5rem; overflow: hidden; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(126, 34, 206, 0.05);">
+                                    <div class="faq-accordion-header" onclick="selectFaqOption('single', '')" style="padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background-color: #f5f3ff; transition: all 0.2s;">
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div class="faq-radio-circle" style="width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid #7e22ce; display: flex; align-items: center; justify-content: center; background-color: #7e22ce; transition: all 0.2s;">
+                                                <div style="width: 0.4rem; height: 0.4rem; border-radius: 50%; background-color: #fff;"></div>
+                                            </div>
+                                            <span style="font-size: 0.85rem; font-weight: 700; color: #581c87;">Formation seule uniquement</span>
+                                        </div>
+                                        <span style="font-size: 0.85rem; font-weight: 700; color: #7e22ce;">{{ number_format($formattedTraining['promo_price'] > 0 ? $formattedTraining['promo_price'] : $formattedTraining['price'], 0, ',', ' ') }} CFA</span>
+                                    </div>
                                 </div>
 
-                                <!-- Selected Pack Info Box (displays: Title, Description 15 chars, Price) -->
-                                <div id="selected_pack_info_box" style="display: none; margin-top: 0.75rem; border-top: 1px dashed rgba(192, 132, 252, 0.5); padding-top: 0.75rem;">
-                                </div>
+                                <!-- Option: Bundles -->
+                                @foreach($training->bundles as $bundle)
+                                    <div class="faq-accordion-item" id="faq_item_{{ $bundle->id }}" style="border: 1px solid #e2e8f0; border-radius: 0.75rem; background-color: #fff; margin-bottom: 0.5rem; overflow: hidden; transition: all 0.2s ease;">
+                                        <div class="faq-accordion-header" onclick="selectFaqOption('bundle', '{{ $bundle->id }}', '{{ $bundle->name }}', '{{ number_format($bundle->price, 0, ',', ' ') }} CFA', '{{ Str::limit($bundle->description, 15) }}')" style="padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s;">
+                                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                <div class="faq-radio-circle" id="faq_radio_{{ $bundle->id }}" style="width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; background-color: #fff; transition: all 0.2s;">
+                                                    <div style="width: 0.4rem; height: 0.4rem; border-radius: 50%; background-color: #fff;"></div>
+                                                </div>
+                                                <span class="faq-title-span" id="faq_title_{{ $bundle->id }}" style="font-size: 0.85rem; font-weight: 700; color: #475569;">Pack : {{ $bundle->name }}</span>
+                                            </div>
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <span style="font-size: 0.85rem; font-weight: 700; color: #475569;">{{ number_format($bundle->price, 0, ',', ' ') }} CFA</span>
+                                                <svg class="faq-chevron" id="faq_chevron_{{ $bundle->id }}" style="width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; color: #94a3b8; transition: transform 0.2s ease;" viewBox="0 0 24 24">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="faq-accordion-body" id="faq_body_{{ $bundle->id }}" style="max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; background-color: #faf9ff;">
+                                            <div style="padding: 0.75rem 1rem; border-top: 1px solid #f1f5f9; font-size: 0.8rem; color: #475569; line-height: 1.4;">
+                                                <div style="margin-bottom: 0.5rem; color: #581c87;">
+                                                    <strong>Description :</strong> {{ Str::limit($bundle->description, 15) }}
+                                                </div>
+                                                <div style="color: #6b21a8; font-weight: 600;">
+                                                    Formations incluses dans ce pack :
+                                                    <ul style="margin: 0.25rem 0 0 0; padding-left: 1.25rem; font-size: 0.75rem; color: #6b21a8; line-height: 1.5;">
+                                                        @foreach($bundle->trainings as $bt)
+                                                            <li>{{ $bt->title }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
 
                             <script>
-                                function selectPackFromDropdown(selectElement) {
-                                    const selectedOption = selectElement.options[selectElement.selectedIndex];
-                                    const infoBox = document.getElementById('selected_pack_info_box');
+                                function selectFaqOption(type, bundleId, bundleName, priceStr, shortDesc) {
+                                    // Reset all items
+                                    const allItems = document.querySelectorAll('.faq-accordion-item');
+                                    allItems.forEach(item => {
+                                        item.style.borderColor = '#e2e8f0';
+                                        item.style.boxShadow = 'none';
+                                        item.querySelector('.faq-accordion-header').style.backgroundColor = '#fff';
+                                        const titleSpan = item.querySelector('.faq-title-span');
+                                        if (titleSpan) titleSpan.style.color = '#475569';
+                                    });
+                                    
+                                    const allRadioCircles = document.querySelectorAll('.faq-radio-circle');
+                                    allRadioCircles.forEach(circle => {
+                                        circle.style.borderColor = '#cbd5e1';
+                                        circle.style.backgroundColor = '#fff';
+                                    });
+
+                                    const allChevrons = document.querySelectorAll('.faq-chevron');
+                                    allChevrons.forEach(chevron => {
+                                        chevron.style.transform = 'rotate(0deg)';
+                                        chevron.style.color = '#94a3b8';
+                                    });
+
+                                    const allBodies = document.querySelectorAll('.faq-accordion-body');
+                                    allBodies.forEach(body => {
+                                        body.style.maxHeight = '0';
+                                    });
+
+                                    // Set inputs
                                     const bundleInput = document.getElementById('main_bundle_id');
                                     const courseInput = document.getElementById('main_course_input');
                                     const courseLabel = document.getElementById('selected_course_label');
-                                    
-                                    if (selectElement.value) {
-                                        const bundleId = selectElement.value;
-                                        const name = selectedOption.getAttribute('data-name');
-                                        const description = selectedOption.getAttribute('data-description');
-                                        const price = selectedOption.getAttribute('data-price');
-                                        
-                                        if (bundleInput) bundleInput.value = bundleId;
-                                        if (courseInput) courseInput.value = name;
-                                        if (courseLabel) courseLabel.value = "Pack " + name;
-                                        
-                                        if (infoBox) {
-                                            infoBox.innerHTML = `
-                                                <div style="font-size: 0.8rem; color: #581c87; line-height: 1.4;">
-                                                    <div style="font-weight: 800; color: #7e22ce;">📦 ${name}</div>
-                                                    <div style="margin-top: 0.2rem; color: #6b21a8;"><strong>Desc:</strong> ${description || 'N/A'}</div>
-                                                    <div style="margin-top: 0.3rem; font-size: 0.9rem; font-weight: 800; color: #7e22ce;">Prix spécial : ${price}</div>
-                                                </div>
-                                            `;
-                                            infoBox.style.display = 'block';
+
+                                    if (type === 'bundle') {
+                                        const activeItem = document.getElementById('faq_item_' + bundleId);
+                                        const activeRadio = document.getElementById('faq_radio_' + bundleId);
+                                        const activeChevron = document.getElementById('faq_chevron_' + bundleId);
+                                        const activeBody = document.getElementById('faq_body_' + bundleId);
+                                        const activeTitle = document.getElementById('faq_title_' + bundleId);
+
+                                        if (activeItem) {
+                                            activeItem.style.borderColor = '#7e22ce';
+                                            activeItem.style.boxShadow = '0 2px 8px rgba(126, 34, 206, 0.08)';
+                                            activeItem.querySelector('.faq-accordion-header').style.backgroundColor = '#f5f3ff';
                                         }
+                                        if (activeTitle) {
+                                            activeTitle.style.color = '#581c87';
+                                        }
+                                        if (activeRadio) {
+                                            activeRadio.style.borderColor = '#7e22ce';
+                                            activeRadio.style.backgroundColor = '#7e22ce';
+                                        }
+                                        if (activeChevron) {
+                                            activeChevron.style.transform = 'rotate(180deg)';
+                                            activeChevron.style.color = '#7e22ce';
+                                        }
+                                        if (activeBody) {
+                                            activeBody.style.maxHeight = activeBody.scrollHeight + 'px';
+                                        }
+
+                                        if (bundleInput) bundleInput.value = bundleId;
+                                        if (courseInput) courseInput.value = bundleName;
+                                        if (courseLabel) courseLabel.value = "Pack " + bundleName;
                                     } else {
+                                        // Single training selected
+                                        const activeItem = document.getElementById('faq_item_single');
+                                        const radioCircle = activeItem.querySelector('.faq-radio-circle');
+                                        
+                                        if (activeItem) {
+                                            activeItem.style.borderColor = '#7e22ce';
+                                            activeItem.style.boxShadow = '0 2px 8px rgba(126, 34, 206, 0.08)';
+                                            activeItem.querySelector('.faq-accordion-header').style.backgroundColor = '#f5f3ff';
+                                        }
+                                        if (radioCircle) {
+                                            radioCircle.style.borderColor = '#7e22ce';
+                                            radioCircle.style.backgroundColor = '#7e22ce';
+                                        }
+
                                         if (bundleInput) bundleInput.value = "";
                                         if (courseInput) courseInput.value = "{{ $formattedTraining['name'] }}";
                                         if (courseLabel) courseLabel.value = "{{ $formattedTraining['name'] }}";
-                                        
-                                        if (infoBox) {
-                                            infoBox.innerHTML = '';
-                                            infoBox.style.display = 'none';
-                                        }
                                     }
                                 }
                             </script>
