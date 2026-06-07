@@ -547,76 +547,81 @@
                         <a href="{{ route('student.dashboard') }}" class="btn-submit-premium" style="text-decoration: none; display: block; text-align: center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.95rem; font-weight: 700; color: white;">Accéder à mon Espace Étudiant 🧑‍🎓</a>
                     </div>
                 @else
-                    <!-- Form Section -->
-                    <h3 class="form-title">S'inscrire au pack complet</h3>
-
                     @if(request('status') === 'duplicate')
                         <div class="alert-premium" style="background-color: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; font-weight: 700; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem;">
                             ⚠️ Vous êtes déjà inscrit(e) à ce pack !
                         </div>
                     @endif
 
-                    <form action="{{ route('register') }}" method="POST" id="main_registration_form">
-                        @csrf
-                        <!-- Hidden field to redirect back to details page on success -->
-                        <input type="hidden" name="redirect_to" value="{{ route('bundle.show', $bundle->id) }}">
-                        <!-- Preselected course -->
-                        <input type="hidden" name="course" value="{{ $bundle->name }}" id="main_course_input">
-                        <!-- Hidden bundle id input -->
-                        <input type="hidden" name="bundle_id" value="{{ $bundle->id }}" id="main_bundle_id">
-
-                        <div class="form-group-custom">
-                            <label>Pack sélectionné</label>
-                            <input type="text" class="form-control-custom" value="Pack {{ $bundle->name }}" id="selected_course_label" disabled style="font-weight: 700; background-color: #f1f5f9;">
+                    @if(session('error'))
+                        <div class="alert-premium" style="background-color: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; font-weight: 700; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem;">
+                            ⚠️ {{ session('error') }}
                         </div>
+                    @endif
 
-                        @auth('client')
+                    @auth('client')
+                        <!-- Form Section -->
+                        <h3 class="form-title">S'inscrire au pack complet</h3>
+                        <form action="{{ route('register') }}" method="POST" id="main_registration_form">
+                            @csrf
+                            <!-- Hidden field to redirect back to details page on success -->
+                            <input type="hidden" name="redirect_to" value="{{ route('bundle.show', $bundle->id) }}">
+                            <!-- Preselected course -->
+                            <input type="hidden" name="course" value="{{ $bundle->name }}" id="main_course_input">
+                            <!-- Hidden bundle id input -->
+                            <input type="hidden" name="bundle_id" value="{{ $bundle->id }}" id="main_bundle_id">
+
+                            <div class="form-group-custom">
+                                <label>Pack sélectionné</label>
+                                <input type="text" class="form-control-custom" value="Pack {{ $bundle->name }}" id="selected_course_label" disabled style="font-weight: 700; background-color: #f1f5f9;">
+                            </div>
+
                             <div class="alert-premium alert-premium-success" style="margin-top: 1rem; margin-bottom: 1.5rem; background-color: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; padding: 1rem; border-radius: 1rem;">
                                 Bonjour <strong>{{ auth('client')->user()->name }}</strong> ! Vous êtes connecté(e). Vos coordonnées sont pré-remplies automatiquement.
                             </div>
                             <input type="hidden" name="name" value="{{ auth('client')->user()->name }}">
                             <input type="hidden" name="phone" value="{{ auth('client')->user()->phone }}">
                             <input type="hidden" name="email" value="{{ auth('client')->user()->email }}">
-                        @else
+
                             <div class="form-group-custom">
-                                <label for="name">Nom complet *</label>
-                                <input type="text" id="name" name="name" class="form-control-custom" required placeholder="Votre nom et prénom">
+                                <label for="month">Session souhaitée</label>
+                                <select id="month" name="month" class="form-control-custom">
+                                    <option value="Juin 2026">Juin 2026</option>
+                                    <option value="Juillet 2026">Juillet 2026</option>
+                                    <option value="Août 2026">Août 2026</option>
+                                    <option value="Septembre 2026">Septembre 2026</option>
+                                </select>
                             </div>
 
                             <div class="form-group-custom">
-                                <label for="phone">Numéro de téléphone *</label>
-                                <input type="tel" id="phone" name="phone" class="form-control-custom" required placeholder="ex: +225 07080910">
+                                <label for="message">Message ou questions (optionnel)</label>
+                                <textarea id="message" name="message" class="form-control-custom" rows="3" placeholder="Avez-vous des questions particulières ?"></textarea>
                             </div>
 
-                            <div class="form-group-custom">
-                                <label for="email">Adresse email *</label>
-                                <input type="email" id="email" name="email" class="form-control-custom" required placeholder="Votre adresse email">
-                            </div>
-                        @endauth
-
-                        <div class="form-group-custom">
-                            <label for="month">Session souhaitée</label>
-                            <select id="month" name="month" class="form-control-custom">
-                                <option value="Juin 2026">Juin 2026</option>
-                                <option value="Juillet 2026">Juillet 2026</option>
-                                <option value="Août 2026">Août 2026</option>
-                                <option value="Septembre 2026">Septembre 2026</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group-custom">
-                            <label for="message">Message ou questions (optionnel)</label>
-                            <textarea id="message" name="message" class="form-control-custom" rows="3" placeholder="Avez-vous des questions particulières ?"></textarea>
-                        </div>
-
-                        <button type="submit" class="btn-submit-premium">
-                            @auth('client')
+                            <button type="submit" class="btn-submit-premium">
                                 S'inscrire en 1 clic 🚀
-                            @else
-                                Confirmer mon inscription au Pack
-                            @endauth
-                        </button>
-                    </form>
+                            </button>
+                        </form>
+                    @else
+                        <!-- Premium Login/Signup CTA Box -->
+                        <div style="background: var(--light-bg); border: 1px solid var(--border-color); padding: 2rem 1.5rem; border-radius: 1.25rem; text-align: center; margin-top: 0.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                            <div style="width: 52px; height: 52px; background: rgba(126, 34, 206, 0.1); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </div>
+                            <h4 style="margin: 0 0 0.5rem; font-size: 1.15rem; font-weight: 800; color: var(--text-dark);">Inscription réservée aux membres</h4>
+                            <p style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--text-main); line-height: 1.6;">
+                                Pour vous inscrire à ce pack de formation et accéder à votre espace de cours, veuillez vous connecter ou créer un compte étudiant.
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <a href="{{ route('student.login') }}" class="btn-submit-premium" style="text-decoration: none; display: flex; align-items: center; justify-content: center; height: 46px; padding: 0; box-sizing: border-box; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); font-size: 0.95rem;">
+                                    Se connecter
+                                </a>
+                                <a href="{{ route('student.signup') }}" style="text-decoration: none; display: flex; align-items: center; justify-content: center; height: 46px; border: 1.5px solid var(--primary); color: var(--primary); border-radius: 0.75rem; font-weight: 700; transition: all 0.2s ease; font-size: 0.95rem; background: transparent; box-sizing: border-box;" onmouseover="this.style.background='rgba(126, 34, 206, 0.05)'" onmouseout="this.style.background='transparent'">
+                                    Créer un compte étudiant
+                                </a>
+                            </div>
+                        </div>
+                    @endauth
                 @endif
             </div>
         </aside>

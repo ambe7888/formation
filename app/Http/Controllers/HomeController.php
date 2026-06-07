@@ -376,17 +376,14 @@ class HomeController extends Controller
             'message' => 'nullable|string',
         ]);
 
-        if (auth('client')->check()) {
-            $client = auth('client')->user();
-        } else {
-            $client = Client::firstOrCreate(
-                ['email' => $request->input('email')],
-                [
-                    'name' => $request->input('name'),
-                    'phone' => $request->input('phone'),
-                ]
-            );
+        if (!auth('client')->check()) {
+            if ($request->has('redirect_to')) {
+                return redirect($request->input('redirect_to'))->with('error', 'Vous devez être connecté pour vous inscrire à une session.');
+            }
+            return redirect()->route('student.login')->with('error', 'Vous devez être connecté pour vous inscrire à une session.');
         }
+
+        $client = auth('client')->user();
 
         // Intercept Bundle Enrolment
         if ($request->has('bundle_id') && !empty($request->input('bundle_id'))) {
