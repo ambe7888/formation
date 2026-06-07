@@ -167,7 +167,7 @@
                     <p style="color: var(--muted); max-width: 600px; margin: 0 auto;">Combinez plusieurs formations pour maximiser vos compétences tout en réalisant des économies substantielles.</p>
                 </div>
 
-                <div class="training-group-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); justify-content: center; gap: 24px; max-width: 960px; margin: 0 auto;">
+                <div class="training-group-grid packs-grid">
                     <?php $__empty_1 = true; $__currentLoopData = $bundles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bundle): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <div class="training-card bundle-card">
                             <div class="training-image" style="background-image: url('<?php echo e($bundle['illustration'] ?? asset('assets/images/default-training.svg')); ?>');">
@@ -236,6 +236,7 @@
 
                 <div class="training-groups">
                     <?php $__currentLoopData = $trainingGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        
                         <article class="training-group">
                             <div class="training-group-head">
                                 <div class="training-group-copy">
@@ -243,62 +244,64 @@
                                     <p><?php echo e($group['description']); ?></p>
                                 </div>
                             </div>
-                            <div class="training-group-grid">
-                                <?php $__currentLoopData = $trainings->where('group', $group['key']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $training): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <div class="training-card" data-month="<?php echo e($training['planned_month']); ?>">
-                                        <div class="training-image" style="background-image: url('<?php echo e($training['illustration']); ?>');">
-                                            <div class="training-image-badges">
-                                                <span class="package-chip"><?php echo e($training['tag']); ?></span>
-                                            </div>
-                                            <div class="price-badge">
-                                                <?php if($training['promo_price'] > 0): ?>
-                                                    <span class="package-price-old"><?php echo e(number_format($training['price'], 0, ',', ' ')); ?> CFA</span>
-                                                <?php endif; ?>
-                                                <strong class="package-price-current"><?php echo e(number_format($training['promo_price'] ?: $training['price'], 0, ',', ' ')); ?> CFA</strong>
-                                            </div>
+                        </article>
+
+                        
+                        <div class="training-cards-scroll">
+                            <?php $__currentLoopData = $trainings->where('group', $group['key']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $training): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <div class="training-card" data-month="<?php echo e($training['planned_month']); ?>">
+                                    <div class="training-image" style="background-image: url('<?php echo e($training['illustration']); ?>');">
+                                        <div class="training-image-badges">
+                                            <span class="package-chip"><?php echo e($training['tag']); ?></span>
                                         </div>
-                                        <div class="training-content">
-                                            <div class="training-location">
-                                                <span class="training-location-icon">
-                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                                                </span>
-                                                <?php echo e($training['location'] ?: 'En ligne'); ?>
-
-                                            </div>
-                                            <h3><?php echo e($training['name']); ?></h3>
-                                            <p class="package-description"><?php echo e(Str::limit($training['description'], 80)); ?></p>
-
-                                            
-                                            <?php if($training['skills']->isNotEmpty()): ?>
-                                            <div class="training-skills-strip">
-                                                <?php $__currentLoopData = $training['skills']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $skill): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <span class="training-skill-tag" style="background-color:<?php echo e($skill->badge_color); ?>;"><?php echo e($skill->name); ?></span>
-                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                            </div>
+                                        <div class="price-badge">
+                                            <?php if($training['promo_price'] > 0): ?>
+                                                <span class="package-price-old"><?php echo e(number_format($training['price'], 0, ',', ' ')); ?> CFA</span>
                                             <?php endif; ?>
-
-                                            <div class="training-card-sep"></div>
-
-                                            <div class="training-action-row">
-                                                <span class="training-date">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                                    <?php echo e($training['date']); ?>
-
-                                                </span>
-                                                <a href="<?php echo e(route('training.show', $training['id'])); ?>" class="btn btn-primary btn-compact">Détails</a>
-                                            </div>
-
-                                            <div class="training-remaining">
-                                                <span class="training-remaining-icon">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                                </span>
-                                                <?php echo e($training['available']); ?> places disponibles
-                                            </div>
+                                            <strong class="package-price-current"><?php echo e(number_format($training['promo_price'] ?: $training['price'], 0, ',', ' ')); ?> CFA</strong>
                                         </div>
                                     </div>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </div>
-                        </article>
+                                    <div class="training-content">
+                                        <div class="training-location">
+                                            <span class="training-location-icon">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            </span>
+                                            <?php echo e($training['location'] ?: 'En ligne'); ?>
+
+                                        </div>
+                                        <h3><?php echo e($training['name']); ?></h3>
+                                        <p class="package-description"><?php echo e(Str::limit($training['description'], 80)); ?></p>
+
+                                        
+                                        <?php if($training['skills']->isNotEmpty()): ?>
+                                        <div class="training-skills-strip">
+                                            <?php $__currentLoopData = $training['skills']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $skill): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <span class="training-skill-tag" style="background-color:<?php echo e($skill->badge_color); ?>;"><?php echo e($skill->name); ?></span>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </div>
+                                        <?php endif; ?>
+
+                                        <div class="training-card-sep"></div>
+
+                                        <div class="training-action-row">
+                                            <span class="training-date">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                                <?php echo e($training['date']); ?>
+
+                                            </span>
+                                            <a href="<?php echo e(route('training.show', $training['id'])); ?>" class="btn btn-primary btn-compact">Détails</a>
+                                        </div>
+
+                                        <div class="training-remaining">
+                                            <span class="training-remaining-icon">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                            </span>
+                                            <?php echo e($training['available']); ?> places disponibles
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
