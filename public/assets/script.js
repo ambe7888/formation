@@ -301,6 +301,33 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 });
+
+                // Filter timeline items
+                const timelineItems = document.querySelectorAll('.timeline-container');
+                timelineItems.forEach(item => {
+                    const itemMonth = item.getAttribute('data-month');
+                    if (selectedMonth === 'all' || itemMonth === selectedMonth) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                // Adjust timeline section visibility
+                const programmeSection = document.getElementById('programme');
+                if (programmeSection && timelineItems.length > 0) {
+                    let hasVisibleTimeline = false;
+                    timelineItems.forEach(item => {
+                        if (item.style.display !== 'none') {
+                            hasVisibleTimeline = true;
+                        }
+                    });
+                    if (hasVisibleTimeline) {
+                        programmeSection.style.display = '';
+                    } else {
+                        programmeSection.style.display = 'none';
+                    }
+                }
                 
                 // Re-initialize category sliders for mobile if visible
                 initCategorySliders();

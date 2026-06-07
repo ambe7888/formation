@@ -301,7 +301,66 @@
                 </div>
             </div>
         </section>
+
+        {{-- Section Programme & Calendrier --}}
+        <section id="programme" class="section section-alt" style="border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-top: 56px; padding-bottom: 56px;">
+            <div class="container">
+                <div class="section-heading" style="text-align: center; margin: 0 auto 40px;">
+                    <span class="eyebrow" style="color: var(--brand);">Calendrier des sessions</span>
+                    <h2 style="font-family: 'Roboto', sans-serif; font-size: 36px; font-weight: 800; text-transform: uppercase; color: #283746; margin: 10px 0;">Notre Programme & Planning</h2>
+                    <p style="color: var(--muted); max-width: 600px; margin: 0 auto;">Planifiez votre montée en compétences en consultant les dates clés de nos prochaines sessions de formation.</p>
+                </div>
+
+                <div class="timeline">
+                    @php $isLeft = true; @endphp
+                    @forelse($trainings as $training)
+                        <div class="timeline-container {{ $isLeft ? 'left' : 'right' }}" data-month="{{ $training['planned_month'] }}">
+                            <div class="timeline-content">
+                                <span class="timeline-date-chip">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    {{ $training['date'] }}
+                                </span>
+                                <h3 style="margin: 10px 0 10px 0; font-family: 'Roboto', sans-serif; font-size: 1.25rem; font-weight: 800; color: #283746;">
+                                    {{ $training['name'] }}
+                                </h3>
+                                <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">
+                                    {{ Str::limit($training['description'], 120) }}
+                                </p>
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px;">
+                                    <span style="font-size: 0.95rem; font-weight: 800; color: var(--text);">
+                                        {{ number_format($training['promo_price'] ?: $training['price'], 0, ',', ' ') }} CFA
+                                    </span>
+                                    <div style="display: flex; gap: 8px;">
+                                        <a href="{{ route('training.show', $training['id']) }}" class="btn btn-secondary btn-compact" style="min-height: 36px; padding: 0 14px; font-size: 0.8rem;">Détails</a>
+                                        @if(auth('client')->check())
+                                            <form action="{{ route('register') }}" method="POST" style="margin: 0; display: inline;">
+                                                @csrf
+                                                <input type="hidden" name="course" value="{{ $training['name'] }}">
+                                                <input type="hidden" name="month" value="{{ $training['planned_month'] ?? 'Juin 2026' }}">
+                                                <button type="submit" class="btn btn-primary btn-compact" style="min-height: 36px; padding: 0 14px; font-size: 0.8rem;">S'inscrire</button>
+                                            </form>
+                                        @else
+                                            <a href="{{ route('student.signup') }}" class="btn btn-primary btn-compact" style="min-height: 36px; padding: 0 14px; font-size: 0.8rem;">S'inscrire</a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @php $isLeft = !$isLeft; @endphp
+                    @empty
+                        <p style="text-align: center; color: var(--muted); width: 100%;">Aucun programme planifié pour le moment.</p>
+                    @endforelse
+                </div>
+            </div>
+        </section>
     </main>
+
+    <footer style="background-color: #171312; color: #94a3b8; text-align: center; padding: 3rem 0; margin-top: 5rem; border-top: 1px solid #1e293b;">
+        <div class="container">
+            <p style="margin: 0; font-weight: 700; color: #fff;">Success Business Training</p>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">Formations professionnelles haut de gamme en IA, Business et Marketing.</p>
+        </div>
+    </footer>
 
     <script src="{{ asset('assets/script.js') }}"></script>
 </body>
