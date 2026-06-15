@@ -319,37 +319,129 @@
             border: 1px solid #a7f3d0;
             color: #065f46;
         }
+
+        /* Compact Header Override */
+        .site-header {
+            background: rgba(244, 239, 231, 0.9) !important;
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(30, 27, 24, 0.08);
+        }
+        .header-bar {
+            min-height: 56px !important;
+            padding: 0 1.5rem !important;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6f665f;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+        .breadcrumb-nav a {
+            color: #1e1b18;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .breadcrumb-nav a:hover {
+            color: var(--brand);
+        }
+        .breadcrumb-separator {
+            color: rgba(30, 27, 24, 0.3);
+        }
+        .breadcrumb-current {
+            color: #1e1b18;
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .nav a {
+            color: #1e1b18 !important;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+        .nav a:hover {
+            color: var(--brand) !important;
+        }
+
+        @media (max-width: 768px) {
+            .header-bar {
+                padding: 10px 1.5rem !important;
+            }
+            .nav {
+                top: 56px !important;
+                background: rgba(244, 239, 231, 0.98) !important;
+                border-bottom: 1px solid rgba(30, 27, 24, 0.08) !important;
+                max-height: calc(100vh - 56px) !important;
+            }
+            .nav a {
+                color: #1e1b18 !important;
+                border-bottom: 1px solid rgba(30, 27, 24, 0.04) !important;
+            }
+            .nav a:hover {
+                color: var(--brand) !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Hero Banner -->
-    <section class="training-hero">
-        <div class="hero-container">
-            <!-- Compact, elegant back arrow link -->
-            <a href="{{ url('/') }}" style="display: inline-flex; align-items: center; color: #a5b4fc; text-decoration: none; font-size: 0.85rem; font-weight: 700; margin-bottom: 1.5rem; transition: color 0.2s;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='#a5b4fc'">
-                <svg style="width: 1rem; height: 1rem; margin-right: 0.35rem; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 24 24">
-                    <line x1="19" y1="12" x2="5" y2="12"></line>
-                    <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
-                Retour aux formations
-            </a>
-
-            <div>
-                <span class="hero-tag">{{ $formattedTraining['tag'] }}</span>
-            <h1 class="hero-title">{{ $formattedTraining['name'] }}</h1>
-            <div style="display: flex; gap: 2rem; color: #cbd5e1; font-weight: 600; font-size: 0.95rem;">
-                <span>📅 Début : {{ $formattedTraining['date'] }}</span>
-                <span>📍 Lieu : {{ $formattedTraining['location'] }}</span>
+    <header class="site-header">
+        <div class="container header-bar">
+            <div class="breadcrumb-nav">
+                <a href="{{ url('/') }}">Accueil</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">{{ $formattedTraining['tag'] }}</span>
             </div>
+            <nav class="nav">
+                <a href="{{ route('trainings.page') }}">Nos formations</a>
+                <a href="{{ route('program.page') }}">Programme</a>
+                <a href="{{ route('skills.page') }}">Compétences</a>
+                @if(auth('client')->check())
+                    <a href="{{ route('student.dashboard') }}" class="btn btn-primary" style="min-height: 38px; padding: 0 16px; font-size: 0.85rem;">Mon Espace 🧑‍🎓</a>
+                    <form action="{{ route('student.logout') }}" method="POST" style="margin: 0; display: inline-flex;">
+                        @csrf
+                        <button type="submit" style="background: none; border: none; color: #1e1b18; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-left: 10px;">Déconnexion</button>
+                    </form>
+                @else
+                    <a href="{{ route('student.login') }}" style="font-size: 0.85rem; font-weight: 700; text-decoration: none;">Connexion</a>
+                    <a href="{{ route('student.signup') }}" class="btn btn-primary" style="min-height: 38px; padding: 0 16px; font-size: 0.85rem;">S'inscrire</a>
+                @endif
+            </nav>
         </div>
-    </section>
+    </header>
 
     <!-- Content Grid -->
-    <main class="content-container">
+    <main class="content-container" style="margin-top: 2rem;">
         <!-- Details Column -->
         <article>
             <div class="details-card">
+                <!-- Training Header Info -->
+                <div class="training-details-header" style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
+                    <span class="hero-tag" style="background: var(--primary); color: #ffffff; display: inline-block; padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">{{ $formattedTraining['tag'] }}</span>
+                    <h1 class="details-main-title" style="font-family: 'Playfair Display', serif; font-size: 2.25rem; font-weight: 900; line-height: 1.25; margin: 0 0 1rem 0; color: var(--text-dark);">{{ $formattedTraining['name'] }}</h1>
+                    <div class="training-meta-row" style="display: flex; gap: 1.5rem; color: #64748b; font-weight: 600; font-size: 0.95rem; flex-wrap: wrap;">
+                        <span>📅 Début : {{ $formattedTraining['date'] }}</span>
+                        <span>📍 Lieu : {{ $formattedTraining['location'] }}</span>
+                    </div>
+                </div>
+
                 <!-- Illustration Box -->
                 <div class="illustration-box" style="background-image: url('{{ $formattedTraining['illustration'] }}');"></div>
 

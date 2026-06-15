@@ -183,19 +183,18 @@
                                     <span class="training-location-icon">📚</span> {{ count($bundle['trainings']) }} formations incluses
                                 </div>
                                 <h3 style="color: #283746; font-size: 1.25rem;">Pack : {{ $bundle['name'] }}</h3>
-                                <p class="package-description" style="margin-bottom: 12px; flex: 0 0 auto;">{{ Str::limit($bundle['description'], 120) }}</p>
+                                <p class="package-description" style="margin-bottom: 8px; flex: 0 0 auto; line-height: 1.5;">{{ Str::limit($bundle['description'], 100) }}</p>
                                 
-                                <!-- Included formations list -->
-                                <div style="margin: 8px 0 16px 0; border-top: 1px dashed rgba(126, 34, 206, 0.15); padding-top: 12px; flex: 1;">
-                                    <span style="font-size: 0.75rem; font-weight: 800; color: #6b21a8; display: block; margin-bottom: 6px; text-transform: uppercase;">Formations incluses :</span>
-                                    <ul style="margin: 0; padding-left: 14px; list-style-type: none;">
+                                <!-- Included formations tags -->
+                                <div style="margin: 8px 0 14px 0; border-top: 1px dashed rgba(126, 34, 206, 0.15); padding-top: 10px; flex: 1;">
+                                    <span style="font-size: 0.7rem; font-weight: 800; color: #6b21a8; display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Modules inclus :</span>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                                         @foreach($bundle['trainings'] as $t)
-                                            <li style="font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; position: relative;">
-                                                <span style="position: absolute; left: -14px; color: #7e22ce;">✓</span>
-                                                <strong>{{ $t['name'] }}</strong>
-                                            </li>
+                                            <span style="background-color: rgba(126, 34, 206, 0.06); color: #7e22ce; border: 1px solid rgba(126, 34, 206, 0.12); font-size: 0.725rem; padding: 3px 8px; border-radius: 999px; font-weight: 700; display: inline-block; white-space: nowrap;">
+                                                ✓ {{ $t['tag'] }}
+                                            </span>
                                         @endforeach
-                                    </ul>
+                                    </div>
                                 </div>
 
                                 <div class="training-action-row" style="border-top: 1px solid var(--line); padding-top: 12px; margin-top: auto;">
