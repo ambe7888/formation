@@ -196,6 +196,19 @@
             display: flex;
             align-items: baseline;
             gap: 1rem;
+        }
+
+        .price-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-container {
             margin-bottom: 2rem;
             padding-bottom: 1.5rem;
             border-bottom: 1px solid var(--border-color);
@@ -473,13 +486,16 @@
         <aside class="sidebar-box">
             <div class="pricing-card">
                 <!-- Price badge -->
-                <div class="price-badge-row">
-                    <?php if($formattedTraining['promo_price'] > 0): ?>
-                        <strong class="current-price"><?php echo e(number_format($formattedTraining['promo_price'], 0, ',', ' ')); ?> CFA</strong>
-                        <span class="old-price"><?php echo e(number_format($formattedTraining['price'], 0, ',', ' ')); ?> CFA</span>
-                    <?php else: ?>
-                        <strong class="current-price"><?php echo e(number_format($formattedTraining['price'], 0, ',', ' ')); ?> CFA</strong>
-                    <?php endif; ?>
+                <div class="price-container">
+                    <span class="price-label">Tarif de la formation</span>
+                    <div class="price-badge-row">
+                        <?php if($formattedTraining['promo_price'] > 0): ?>
+                            <strong class="current-price"><?php echo e(number_format($formattedTraining['promo_price'], 0, ',', ' ')); ?> CFA</strong>
+                            <span class="old-price"><?php echo e(number_format($formattedTraining['price'], 0, ',', ' ')); ?> CFA</span>
+                        <?php else: ?>
+                            <strong class="current-price"><?php echo e(number_format($formattedTraining['price'], 0, ',', ' ')); ?> CFA</strong>
+                        <?php endif; ?>
+                    </div>
                 </div>
 
                 <!-- Meta Session parameters -->

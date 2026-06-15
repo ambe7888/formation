@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo e(asset('assets/style.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/style.css')); ?>?v=1.0.2">
     <style>
         .page-header-hero {
             padding: 80px 0 40px;
@@ -87,7 +87,12 @@
                                     </div>
                                     <div class="formation-content" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1;">
                                         <div>
-                                            <h4 style="margin: 0 0 8px 0; font-size: 1.25rem; font-weight: 800; color: #283746;"><?php echo e($training['name']); ?></h4>
+                                            <h4 style="margin: 0 0 8px 0; font-size: 1.25rem; font-weight: 800;">
+                                                <a href="<?php echo e(route('training.show', $training['id'])); ?>" style="color: #283746; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='#283746'">
+                                                    <?php echo e($training['name']); ?>
+
+                                                </a>
+                                            </h4>
                                             <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--muted); line-height: 1.5;"><?php echo e($training['description']); ?></p>
                                             <div class="formation-meta" style="display: flex; gap: 16px; font-size: 0.8rem; color: var(--muted); flex-wrap: wrap; margin-bottom: 12px;">
                                                 <span>📅 <?php echo e($training['date']); ?></span>
