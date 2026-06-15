@@ -116,7 +116,11 @@
                                             </div>
 
                                             <div class="package-title-row">
-                                                <h3>{{ $training['name'] }}</h3>
+                                                <h3>
+                                                    <a href="{{ isset($training['type']) && $training['type'] === 'bundle' ? route('bundle.show', $training['id']) : route('training.show', $training['id']) }}" style="color: inherit; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='inherit'">
+                                                        {{ $training['name'] }}
+                                                    </a>
+                                                </h3>
                                             </div>
 
                                             <p class="package-description">{{ Str::limit($training['description'], 90) }}</p>
@@ -182,7 +186,11 @@
                                 <div class="training-location">
                                     <span class="training-location-icon">📚</span> {{ count($bundle['trainings']) }} formations incluses
                                 </div>
-                                <h3 style="color: #283746; font-size: 1.25rem;">Pack : {{ $bundle['name'] }}</h3>
+                                <h3 style="font-size: 1.25rem; margin: 0 0 8px 0;">
+                                    <a href="{{ route('bundle.show', $bundle['id']) }}" style="color: #283746; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='#283746'">
+                                        Pack : {{ $bundle['name'] }}
+                                    </a>
+                                </h3>
                                 <p class="package-description" style="margin-bottom: 8px; flex: 0 0 auto; line-height: 1.5;">{{ Str::limit($bundle['description'], 100) }}</p>
                                 
                                 <!-- Included formations tags -->
@@ -264,7 +272,11 @@
                                             </span>
                                             {{ $training['location'] ?: 'En ligne' }}
                                         </div>
-                                        <h3>{{ $training['name'] }}</h3>
+                                        <h3>
+                                            <a href="{{ route('training.show', $training['id']) }}" style="color: inherit; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='inherit'">
+                                                {{ $training['name'] }}
+                                            </a>
+                                        </h3>
                                         <p class="package-description">{{ Str::limit($training['description'], 80) }}</p>
 
                                         {{-- Skills tags --}}
@@ -319,9 +331,11 @@
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     {{ $training['date'] }}
                                 </span>
-                                <h3 style="margin: 10px 0 10px 0; font-family: 'Roboto', sans-serif; font-size: 1.25rem; font-weight: 800; color: #283746;">
-                                    {{ $training['name'] }}
-                                </h3>
+                                 <h3 style="margin: 10px 0 10px 0; font-family: 'Roboto', sans-serif; font-size: 1.25rem; font-weight: 800;">
+                                     <a href="{{ route('training.show', $training['id']) }}" style="color: #283746; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='#283746'">
+                                         {{ $training['name'] }}
+                                     </a>
+                                 </h3>
                                 <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">
                                     {{ Str::limit($training['description'], 120) }}
                                 </p>

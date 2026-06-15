@@ -87,7 +87,11 @@
                                     </div>
                                     <div class="formation-content" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1;">
                                         <div>
-                                            <h4 style="margin: 0 0 8px 0; font-size: 1.25rem; font-weight: 800; color: #283746;">{{ $training['name'] }}</h4>
+                                            <h4 style="margin: 0 0 8px 0; font-size: 1.25rem; font-weight: 800;">
+                                                <a href="{{ route('training.show', $training['id']) }}" style="color: #283746; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='#283746'">
+                                                    {{ $training['name'] }}
+                                                </a>
+                                            </h4>
                                             <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: var(--muted); line-height: 1.5;">{{ $training['description'] }}</p>
                                             <div class="formation-meta" style="display: flex; gap: 16px; font-size: 0.8rem; color: var(--muted); flex-wrap: wrap; margin-bottom: 12px;">
                                                 <span>📅 {{ $training['date'] }}</span>
