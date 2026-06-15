@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo e(asset('assets/style.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/style.css')); ?>?v=1.0.2">
     <style>
         :root {
             --primary: #7e22ce;
@@ -28,41 +28,7 @@
             padding: 0;
         }
 
-        /* Glassmorphic Navigation Header */
-        .details-header {
-            position: sticky;
-            top: 0;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-            z-index: 100;
-            padding: 1rem 0;
-        }
 
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            color: var(--text-dark);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            gap: 0.5rem;
-        }
-
-        .back-btn:hover {
-            color: var(--primary);
-            transform: translateX(-3px);
-        }
 
         /* Hero details banner */
         .training-hero {
@@ -417,48 +383,129 @@
             border: 1px solid #a7f3d0;
             color: #065f46;
         }
+
+        /* Compact Header Override */
+        .site-header {
+            background: rgba(244, 239, 231, 0.9) !important;
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(30, 27, 24, 0.08);
+        }
+        .header-bar {
+            min-height: 56px !important;
+            padding: 0 1.5rem !important;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6f665f;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+        .breadcrumb-nav a {
+            color: #1e1b18;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .breadcrumb-nav a:hover {
+            color: var(--brand);
+        }
+        .breadcrumb-separator {
+            color: rgba(30, 27, 24, 0.3);
+        }
+        .breadcrumb-current {
+            color: #1e1b18;
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .nav a {
+            color: #1e1b18 !important;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+        .nav a:hover {
+            color: var(--brand) !important;
+        }
+
+        @media (max-width: 768px) {
+            .header-bar {
+                padding: 10px 1.5rem !important;
+            }
+            .nav {
+                top: 56px !important;
+                background: rgba(244, 239, 231, 0.98) !important;
+                border-bottom: 1px solid rgba(30, 27, 24, 0.08) !important;
+                max-height: calc(100vh - 56px) !important;
+            }
+            .nav a {
+                color: #1e1b18 !important;
+                border-bottom: 1px solid rgba(30, 27, 24, 0.04) !important;
+            }
+            .nav a:hover {
+                color: var(--brand) !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Header / Navigation backlink -->
-    <header class="details-header">
-        <div class="header-container">
-            <a href="<?php echo e(url('/')); ?>" class="back-btn">
-                <span>←</span> Retour à l'accueil
-            </a>
-            <div style="display: flex; align-items: center; gap: 1.5rem;">
+    <header class="site-header">
+        <div class="container header-bar">
+            <div class="breadcrumb-nav">
+                <a href="<?php echo e(url('/')); ?>">Accueil</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="<?php echo e(url('/')); ?>">Packs</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current"><?php echo e($bundle->name); ?></span>
+            </div>
+            <nav class="nav">
+                <a href="<?php echo e(route('trainings.page')); ?>">Nos formations</a>
+                <a href="<?php echo e(route('program.page')); ?>">Programme</a>
+                <a href="<?php echo e(route('skills.page')); ?>">Compétences</a>
                 <?php if(auth('client')->check()): ?>
-                    <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-dark);">🧑‍🎓 <?php echo e(auth('client')->user()->name); ?></span>
-                    <a href="<?php echo e(route('student.dashboard')); ?>" style="background: var(--primary); color: #fff; padding: 0.4rem 1rem; border-radius: 0.5rem; font-weight: 700; text-decoration: none; font-size: 0.85rem;">Mon Espace</a>
-                    <form action="<?php echo e(route('student.logout')); ?>" method="POST" style="margin: 0; display: inline;">
+                    <a href="<?php echo e(route('student.dashboard')); ?>" class="btn btn-primary" style="min-height: 38px; padding: 0 16px; font-size: 0.85rem;">Mon Espace 🧑‍🎓</a>
+                    <form action="<?php echo e(route('student.logout')); ?>" method="POST" style="margin: 0; display: inline-flex;">
                         <?php echo csrf_field(); ?>
-                        <button type="submit" style="background: none; border: none; color: var(--text-main); font: inherit; cursor: pointer; font-weight: 600; padding: 0; font-size: 0.85rem;">Déconnexion</button>
+                        <button type="submit" style="background: none; border: none; color: #1e1b18; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-left: 10px;">Déconnexion</button>
                     </form>
                 <?php else: ?>
-                    <a href="<?php echo e(route('student.login')); ?>" style="color: var(--text-dark); text-decoration: none; font-weight: 700; font-size: 0.85rem;">Connexion</a>
-                    <a href="<?php echo e(route('student.signup')); ?>" style="background: var(--dark); color: #fff; padding: 0.4rem 1rem; border-radius: 0.5rem; font-weight: 700; text-decoration: none; font-size: 0.85rem;">Créer un compte</a>
+                    <a href="<?php echo e(route('student.login')); ?>" style="font-size: 0.85rem; font-weight: 700; text-decoration: none;">Connexion</a>
+                    <a href="<?php echo e(route('student.signup')); ?>" class="btn btn-primary" style="min-height: 38px; padding: 0 16px; font-size: 0.85rem;">S'inscrire</a>
                 <?php endif; ?>
-            </div>
+            </nav>
         </div>
     </header>
 
-    <!-- Hero Banner -->
-    <section class="training-hero">
-        <div class="hero-container">
-            <span class="hero-tag">Offre Spéciale Pack</span>
-            <h1 class="hero-title">Pack : <?php echo e($bundle->name); ?></h1>
-            <p style="font-size: 1.15rem; color: #e9d5ff; max-width: 800px; margin: 0; font-weight: 500;">
-                Regroupe <?php echo e($bundle->trainings->count()); ?> formations d'exception à un prix réduit exclusif.
-            </p>
-        </div>
-    </section>
-
     <!-- Content Grid -->
-    <main class="content-container">
+    <main class="content-container" style="margin-top: 2rem;">
         <!-- Details Column -->
         <article>
             <div class="details-card">
+                <!-- Pack Header Info -->
+                <div class="training-details-header" style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
+                    <span class="hero-tag" style="background: var(--primary); color: #ffffff; display: inline-block; padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">Offre Spéciale Pack</span>
+                    <h1 class="details-main-title" style="font-family: 'Playfair Display', serif; font-size: 2.25rem; font-weight: 900; line-height: 1.25; margin: 0 0 1rem 0; color: var(--text-dark);">Pack : <?php echo e($bundle->name); ?></h1>
+                    <p style="font-size: 1.05rem; color: #64748b; margin: 0; font-weight: 500;">
+                        Regroupe <?php echo e($bundle->trainings->count()); ?> formations d'exception à un prix réduit exclusif.
+                    </p>
+                </div>
                 <h2 class="section-title">Présentation du Pack</h2>
                 <div class="description-text">
                     <?php echo e($bundle->description); ?>
@@ -550,14 +597,26 @@
                         <a href="<?php echo e(route('student.dashboard')); ?>" class="btn-submit-premium" style="text-decoration: none; display: block; text-align: center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.95rem; font-weight: 700; color: white;">Accéder à mon Espace Étudiant 🧑‍🎓</a>
                     </div>
                 <?php else: ?>
-                    <!-- Form Section -->
-                    <h3 class="form-title">S'inscrire au pack complet</h3>
-
                     <?php if(request('status') === 'duplicate'): ?>
                         <div class="alert-premium" style="background-color: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; font-weight: 700; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem;">
                             ⚠️ Vous êtes déjà inscrit(e) à ce pack !
                         </div>
                     <?php endif; ?>
+
+                    <?php if(session('error')): ?>
+                        <div class="alert-premium" style="background-color: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; font-weight: 700; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem;">
+                            ⚠️ <?php echo e(session('error')); ?>
+
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Form Section -->
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.25rem;">
+                        <h3 class="form-title" style="margin: 0;">S'inscrire au pack complet</h3>
+                        <?php if(auth()->guard('client')->guest()): ?>
+                            <a href="<?php echo e(route('student.login')); ?>" style="font-size: 0.85rem; font-weight: 700; color: var(--primary); text-decoration: none;">Déjà inscrit ? Se connecter</a>
+                        <?php endif; ?>
+                    </div>
 
                     <form action="<?php echo e(route('register')); ?>" method="POST" id="main_registration_form">
                         <?php echo csrf_field(); ?>
@@ -595,6 +654,12 @@
                                 <label for="email">Adresse email *</label>
                                 <input type="email" id="email" name="email" class="form-control-custom" required placeholder="Votre adresse email">
                             </div>
+
+                            <div class="form-group-custom">
+                                <label for="password">Mot de passe étudiant *</label>
+                                <input type="password" id="password" name="password" class="form-control-custom" required minlength="6" placeholder="Créez votre mot de passe (min. 6 caractères)">
+                                <span style="font-size: 0.75rem; color: var(--text-main); margin-top: 0.25rem; display: block; opacity: 0.85;">Ce mot de passe servira à vous connecter à votre Espace Étudiant.</span>
+                            </div>
                         <?php endif; ?>
 
                         <div class="form-group-custom">
@@ -616,7 +681,7 @@
                             <?php if(auth()->guard('client')->check()): ?>
                                 S'inscrire en 1 clic 🚀
                             <?php else: ?>
-                                Confirmer mon inscription au Pack
+                                Créer mon compte & m'inscrire 🚀
                             <?php endif; ?>
                         </button>
                     </form>

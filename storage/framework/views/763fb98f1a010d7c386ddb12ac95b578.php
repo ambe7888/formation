@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Créer un compte étudiant - Success Business Training</title>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo e(asset('assets/style.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/style.css')); ?>?v=1.0.2">
     <style>
         body {
             font-family: 'Manrope', sans-serif;

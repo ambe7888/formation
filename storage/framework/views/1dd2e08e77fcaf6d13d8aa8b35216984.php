@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo e(asset('assets/style.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/style.css')); ?>?v=1.0.2">
     <style>
         :root {
             --primary: #4f46e5;
@@ -28,41 +28,7 @@
             padding: 0;
         }
 
-        /* Glassmorphic Navigation Header */
-        .details-header {
-            position: sticky;
-            top: 0;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-            z-index: 100;
-            padding: 1rem 0;
-        }
 
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            color: var(--text-dark);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            gap: 0.5rem;
-        }
-
-        .back-btn:hover {
-            color: var(--primary);
-            transform: translateX(-3px);
-        }
 
         /* Hero details banner */
         .training-hero {
@@ -353,49 +319,129 @@
             border: 1px solid #a7f3d0;
             color: #065f46;
         }
+
+        /* Compact Header Override */
+        .site-header {
+            background: rgba(244, 239, 231, 0.9) !important;
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(30, 27, 24, 0.08);
+        }
+        .header-bar {
+            min-height: 56px !important;
+            padding: 0 1.5rem !important;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6f665f;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+        .breadcrumb-nav a {
+            color: #1e1b18;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .breadcrumb-nav a:hover {
+            color: var(--brand);
+        }
+        .breadcrumb-separator {
+            color: rgba(30, 27, 24, 0.3);
+        }
+        .breadcrumb-current {
+            color: #1e1b18;
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .nav a {
+            color: #1e1b18 !important;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+        .nav a:hover {
+            color: var(--brand) !important;
+        }
+
+        @media (max-width: 768px) {
+            .header-bar {
+                padding: 10px 1.5rem !important;
+            }
+            .nav {
+                top: 56px !important;
+                background: rgba(244, 239, 231, 0.98) !important;
+                border-bottom: 1px solid rgba(30, 27, 24, 0.08) !important;
+                max-height: calc(100vh - 56px) !important;
+            }
+            .nav a {
+                color: #1e1b18 !important;
+                border-bottom: 1px solid rgba(30, 27, 24, 0.04) !important;
+            }
+            .nav a:hover {
+                color: var(--brand) !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Header / Navigation backlink -->
-    <header class="details-header">
-        <div class="header-container">
-            <a href="<?php echo e(url('/')); ?>" class="back-btn">
-                <span>←</span> Retour à l'accueil
-            </a>
-            <div style="display: flex; align-items: center; gap: 1.5rem;">
+    <header class="site-header">
+        <div class="container header-bar">
+            <div class="breadcrumb-nav">
+                <a href="<?php echo e(url('/')); ?>">Accueil</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current"><?php echo e($formattedTraining['tag']); ?></span>
+            </div>
+            <nav class="nav">
+                <a href="<?php echo e(route('trainings.page')); ?>">Nos formations</a>
+                <a href="<?php echo e(route('program.page')); ?>">Programme</a>
+                <a href="<?php echo e(route('skills.page')); ?>">Compétences</a>
                 <?php if(auth('client')->check()): ?>
-                    <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-dark);">🧑‍🎓 <?php echo e(auth('client')->user()->name); ?></span>
-                    <a href="<?php echo e(route('student.dashboard')); ?>" style="background: var(--primary); color: #fff; padding: 0.4rem 1rem; border-radius: 0.5rem; font-weight: 700; text-decoration: none; font-size: 0.85rem;">Mon Espace</a>
-                    <form action="<?php echo e(route('student.logout')); ?>" method="POST" style="margin: 0; display: inline;">
+                    <a href="<?php echo e(route('student.dashboard')); ?>" class="btn btn-primary" style="min-height: 38px; padding: 0 16px; font-size: 0.85rem;">Mon Espace 🧑‍🎓</a>
+                    <form action="<?php echo e(route('student.logout')); ?>" method="POST" style="margin: 0; display: inline-flex;">
                         <?php echo csrf_field(); ?>
-                        <button type="submit" style="background: none; border: none; color: var(--text-main); font: inherit; cursor: pointer; font-weight: 600; padding: 0; font-size: 0.85rem;">Déconnexion</button>
+                        <button type="submit" style="background: none; border: none; color: #1e1b18; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-left: 10px;">Déconnexion</button>
                     </form>
                 <?php else: ?>
-                    <a href="<?php echo e(route('student.login')); ?>" style="color: var(--text-dark); text-decoration: none; font-weight: 700; font-size: 0.85rem;">Connexion</a>
-                    <a href="<?php echo e(route('student.signup')); ?>" style="background: var(--dark); color: #fff; padding: 0.4rem 1rem; border-radius: 0.5rem; font-weight: 700; text-decoration: none; font-size: 0.85rem;">Créer un compte</a>
+                    <a href="<?php echo e(route('student.login')); ?>" style="font-size: 0.85rem; font-weight: 700; text-decoration: none;">Connexion</a>
+                    <a href="<?php echo e(route('student.signup')); ?>" class="btn btn-primary" style="min-height: 38px; padding: 0 16px; font-size: 0.85rem;">S'inscrire</a>
                 <?php endif; ?>
-            </div>
+            </nav>
         </div>
     </header>
 
-    <!-- Hero Banner -->
-    <section class="training-hero">
-        <div class="hero-container">
-            <span class="hero-tag"><?php echo e($formattedTraining['tag']); ?></span>
-            <h1 class="hero-title"><?php echo e($formattedTraining['name']); ?></h1>
-            <div style="display: flex; gap: 2rem; color: #cbd5e1; font-weight: 600; font-size: 0.95rem;">
-                <span>📅 Début : <?php echo e($formattedTraining['date']); ?></span>
-                <span>📍 Lieu : <?php echo e($formattedTraining['location']); ?></span>
-            </div>
-        </div>
-    </section>
-
     <!-- Content Grid -->
-    <main class="content-container">
+    <main class="content-container" style="margin-top: 2rem;">
         <!-- Details Column -->
         <article>
             <div class="details-card">
+                <!-- Training Header Info -->
+                <div class="training-details-header" style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
+                    <span class="hero-tag" style="background: var(--primary); color: #ffffff; display: inline-block; padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;"><?php echo e($formattedTraining['tag']); ?></span>
+                    <h1 class="details-main-title" style="font-family: 'Playfair Display', serif; font-size: 2.25rem; font-weight: 900; line-height: 1.25; margin: 0 0 1rem 0; color: var(--text-dark);"><?php echo e($formattedTraining['name']); ?></h1>
+                    <div class="training-meta-row" style="display: flex; gap: 1.5rem; color: #64748b; font-weight: 600; font-size: 0.95rem; flex-wrap: wrap;">
+                        <span>📅 Début : <?php echo e($formattedTraining['date']); ?></span>
+                        <span>📍 Lieu : <?php echo e($formattedTraining['location']); ?></span>
+                    </div>
+                </div>
+
                 <!-- Illustration Box -->
                 <div class="illustration-box" style="background-image: url('<?php echo e($formattedTraining['illustration']); ?>');"></div>
 
@@ -418,6 +464,8 @@
                         <span class="text-muted">Aucune compétence spécifique répertoriée pour cette formation.</span>
                     <?php endif; ?>
                 </div>
+
+
             </div>
         </article>
 
@@ -455,60 +503,6 @@
                     </li>
                 </ul>
 
-                <!-- Bundle Promo Alert Banner -->
-                <?php if($training->bundles->isNotEmpty()): ?>
-                    <?php $__currentLoopData = $training->bundles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bundle): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="alert-premium" style="background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); border: 1px solid #c084fc; color: #581c87; margin-bottom: 1.5rem; border-radius: 1rem; padding: 1.25rem;">
-                            <strong style="color: #7e22ce; font-size: 1rem; display: block; margin-bottom: 0.5rem;">💡 Offre Spéciale Pack !</strong>
-                            Cette formation fait partie du pack premium <strong>"<?php echo e($bundle->name); ?>"</strong> qui regroupe :
-                            <ul style="margin: 0.5rem 0; padding-left: 1.2rem; font-size: 0.85rem;">
-                                <?php $__currentLoopData = $bundle->trainings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <li><?php echo e($bt->title); ?></li>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </ul>
-                            Bénéficiez du pack complet pour seulement 
-                            <strong style="font-size: 1.2rem; color: #7e22ce;"><?php echo e(number_format($bundle->price, 0, ',', ' ')); ?> CFA</strong> 
-                            au lieu de ~~<?php echo e(number_format($bundle->trainings->sum('price'), 0, ',', ' ')); ?> CFA~~ !
-                            
-                            <button type="button" class="btn-submit-premium mt-3" style="background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%); font-size: 0.9rem; padding: 0.75rem; box-shadow: 0 4px 12px rgba(126, 34, 206, 0.2);" onclick="enrollInBundle(<?php echo e($bundle->id); ?>, '<?php echo e($bundle->name); ?>')">
-                                S'inscrire au Pack complet 🚀
-                            </button>
-                        </div>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
-                    <script>
-                        function enrollInBundle(bundleId, bundleName) {
-                            document.getElementById('main_bundle_id').value = bundleId;
-                            
-                            // Update display name
-                            const courseLabel = document.getElementById('selected_course_label');
-                            if (courseLabel) {
-                                courseLabel.value = bundleName;
-                            }
-                            
-                            const courseInput = document.getElementById('main_course_input');
-                            if (courseInput) {
-                                courseInput.value = bundleName;
-                            }
-
-                            <?php if(auth()->guard('client')->check()): ?>
-                                // Connected student: submit the form in 1-click!
-                                const form = document.getElementById('main_registration_form');
-                                if (form) {
-                                    form.submit();
-                                }
-                            <?php else: ?>
-                                // Unauthenticated visitor: focus fields to register
-                                const nameField = document.getElementById('name');
-                                if (nameField) {
-                                    nameField.focus();
-                                }
-                                alert("Offre activée : " + bundleName + " ! Veuillez maintenant remplir vos coordonnées ci-dessous pour valider l'inscription au pack complet.");
-                            <?php endif; ?>
-                        }
-                    </script>
-                <?php endif; ?>
-
                 <?php if(request('status') === 'success'): ?>
                     <div class="thank-you-card" style="text-align: center; padding: 2rem; background: #ffffff; border-radius: 1.5rem; border: 2px solid #10b981; box-shadow: 0 20px 40px rgba(16, 185, 129, 0.08); width: 100%; box-sizing: border-box;">
                         <span style="font-size: 3.5rem; display: block; margin-bottom: 1rem;">🎉</span>
@@ -527,14 +521,26 @@
                         <a href="<?php echo e(route('student.dashboard')); ?>" class="btn-submit-premium" style="text-decoration: none; display: block; text-align: center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.95rem; font-weight: 700; color: white;">Accéder à mon Espace Étudiant 🧑‍🎓</a>
                     </div>
                 <?php else: ?>
-                    <!-- Form Section -->
-                    <h3 class="form-title">S'inscrire à cette session</h3>
-
                     <?php if(request('status') === 'duplicate'): ?>
                         <div class="alert-premium" style="background-color: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; font-weight: 700; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem;">
                             ⚠️ Vous êtes déjà inscrit(e) à cette formation ou ce pack !
                         </div>
                     <?php endif; ?>
+
+                    <?php if(session('error')): ?>
+                        <div class="alert-premium" style="background-color: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; font-weight: 700; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem;">
+                            ⚠️ <?php echo e(session('error')); ?>
+
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Form Section -->
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.25rem;">
+                        <h3 class="form-title" style="margin: 0;">S'inscrire à cette session</h3>
+                        <?php if(auth()->guard('client')->guest()): ?>
+                            <a href="<?php echo e(route('student.login')); ?>" style="font-size: 0.85rem; font-weight: 700; color: var(--primary); text-decoration: none;">Déjà inscrit ? Se connecter</a>
+                        <?php endif; ?>
+                    </div>
 
                     <form action="<?php echo e(route('register')); ?>" method="POST" id="main_registration_form">
                         <?php echo csrf_field(); ?>
@@ -544,6 +550,148 @@
                         <input type="hidden" name="course" value="<?php echo e($formattedTraining['name']); ?>" id="main_course_input">
                         <!-- Hidden bundle id input -->
                         <input type="hidden" name="bundle_id" value="" id="main_bundle_id">
+
+                        <?php if($training->bundles->isNotEmpty()): ?>
+                            <!-- Pack Promo FAQ Accordion inside Form -->
+                            <div class="faq-accordion-container" style="margin-bottom: 1.25rem;">
+                                <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 0.5rem;">Option d'inscription *</label>
+                                
+                                <!-- Option: Single Training -->
+                                <div class="faq-accordion-item active-faq" id="faq_item_single" style="border: 1px solid #7e22ce; border-radius: 0.75rem; background-color: #fff; margin-bottom: 0.5rem; overflow: hidden; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(126, 34, 206, 0.05);">
+                                    <div class="faq-accordion-header" onclick="selectFaqOption('single', '')" style="padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background-color: #f5f3ff; transition: all 0.2s;">
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <div class="faq-radio-circle" style="width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid #7e22ce; display: flex; align-items: center; justify-content: center; background-color: #7e22ce; transition: all 0.2s;">
+                                                <div style="width: 0.4rem; height: 0.4rem; border-radius: 50%; background-color: #fff;"></div>
+                                            </div>
+                                            <span style="font-size: 0.85rem; font-weight: 700; color: #581c87;">Formation seule uniquement</span>
+                                        </div>
+                                        <span style="font-size: 0.85rem; font-weight: 700; color: #7e22ce;"><?php echo e(number_format($formattedTraining['promo_price'] > 0 ? $formattedTraining['promo_price'] : $formattedTraining['price'], 0, ',', ' ')); ?> CFA</span>
+                                    </div>
+                                </div>
+
+                                <!-- Option: Bundles -->
+                                <?php $__currentLoopData = $training->bundles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bundle): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="faq-accordion-item" id="faq_item_<?php echo e($bundle->id); ?>" style="border: 1px solid #e2e8f0; border-radius: 0.75rem; background-color: #fff; margin-bottom: 0.5rem; overflow: hidden; transition: all 0.2s ease;">
+                                        <div class="faq-accordion-header" onclick="selectFaqOption('bundle', '<?php echo e($bundle->id); ?>', '<?php echo e($bundle->name); ?>', '<?php echo e(number_format($bundle->price, 0, ',', ' ')); ?> CFA', '<?php echo e(Str::limit($bundle->description, 15)); ?>')" style="padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s;">
+                                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                <div class="faq-radio-circle" id="faq_radio_<?php echo e($bundle->id); ?>" style="width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; background-color: #fff; transition: all 0.2s;">
+                                                    <div style="width: 0.4rem; height: 0.4rem; border-radius: 50%; background-color: #fff;"></div>
+                                                </div>
+                                                <span class="faq-title-span" id="faq_title_<?php echo e($bundle->id); ?>" style="font-size: 0.85rem; font-weight: 700; color: #475569;">Pack : <?php echo e($bundle->name); ?></span>
+                                            </div>
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <span style="font-size: 0.85rem; font-weight: 700; color: #475569;"><?php echo e(number_format($bundle->price, 0, ',', ' ')); ?> CFA</span>
+                                                <svg class="faq-chevron" id="faq_chevron_<?php echo e($bundle->id); ?>" style="width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; color: #94a3b8; transition: transform 0.2s ease;" viewBox="0 0 24 24">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="faq-accordion-body" id="faq_body_<?php echo e($bundle->id); ?>" style="max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; background-color: #faf9ff;">
+                                            <div style="padding: 0.75rem 1rem; border-top: 1px solid #f1f5f9; font-size: 0.8rem; color: #475569; line-height: 1.4;">
+                                                <div style="margin-bottom: 0.5rem; color: #581c87;">
+                                                    <strong>Description :</strong> <?php echo e(Str::limit($bundle->description, 15)); ?>
+
+                                                </div>
+                                                <div style="color: #6b21a8; font-weight: 600;">
+                                                    Formations incluses dans ce pack :
+                                                    <ul style="margin: 0.25rem 0 0 0; padding-left: 1.25rem; font-size: 0.75rem; color: #6b21a8; line-height: 1.5;">
+                                                        <?php $__currentLoopData = $bundle->trainings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <li><?php echo e($bt->title); ?></li>
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+
+                            <script>
+                                function selectFaqOption(type, bundleId, bundleName, priceStr, shortDesc) {
+                                    // Reset all items
+                                    const allItems = document.querySelectorAll('.faq-accordion-item');
+                                    allItems.forEach(item => {
+                                        item.style.borderColor = '#e2e8f0';
+                                        item.style.boxShadow = 'none';
+                                        item.querySelector('.faq-accordion-header').style.backgroundColor = '#fff';
+                                        const titleSpan = item.querySelector('.faq-title-span');
+                                        if (titleSpan) titleSpan.style.color = '#475569';
+                                    });
+                                    
+                                    const allRadioCircles = document.querySelectorAll('.faq-radio-circle');
+                                    allRadioCircles.forEach(circle => {
+                                        circle.style.borderColor = '#cbd5e1';
+                                        circle.style.backgroundColor = '#fff';
+                                    });
+
+                                    const allChevrons = document.querySelectorAll('.faq-chevron');
+                                    allChevrons.forEach(chevron => {
+                                        chevron.style.transform = 'rotate(0deg)';
+                                        chevron.style.color = '#94a3b8';
+                                    });
+
+                                    const allBodies = document.querySelectorAll('.faq-accordion-body');
+                                    allBodies.forEach(body => {
+                                        body.style.maxHeight = '0';
+                                    });
+
+                                    // Set inputs
+                                    const bundleInput = document.getElementById('main_bundle_id');
+                                    const courseInput = document.getElementById('main_course_input');
+                                    const courseLabel = document.getElementById('selected_course_label');
+
+                                    if (type === 'bundle') {
+                                        const activeItem = document.getElementById('faq_item_' + bundleId);
+                                        const activeRadio = document.getElementById('faq_radio_' + bundleId);
+                                        const activeChevron = document.getElementById('faq_chevron_' + bundleId);
+                                        const activeBody = document.getElementById('faq_body_' + bundleId);
+                                        const activeTitle = document.getElementById('faq_title_' + bundleId);
+
+                                        if (activeItem) {
+                                            activeItem.style.borderColor = '#7e22ce';
+                                            activeItem.style.boxShadow = '0 2px 8px rgba(126, 34, 206, 0.08)';
+                                            activeItem.querySelector('.faq-accordion-header').style.backgroundColor = '#f5f3ff';
+                                        }
+                                        if (activeTitle) {
+                                            activeTitle.style.color = '#581c87';
+                                        }
+                                        if (activeRadio) {
+                                            activeRadio.style.borderColor = '#7e22ce';
+                                            activeRadio.style.backgroundColor = '#7e22ce';
+                                        }
+                                        if (activeChevron) {
+                                            activeChevron.style.transform = 'rotate(180deg)';
+                                            activeChevron.style.color = '#7e22ce';
+                                        }
+                                        if (activeBody) {
+                                            activeBody.style.maxHeight = activeBody.scrollHeight + 'px';
+                                        }
+
+                                        if (bundleInput) bundleInput.value = bundleId;
+                                        if (courseInput) courseInput.value = bundleName;
+                                        if (courseLabel) courseLabel.value = "Pack " + bundleName;
+                                    } else {
+                                        // Single training selected
+                                        const activeItem = document.getElementById('faq_item_single');
+                                        const radioCircle = activeItem.querySelector('.faq-radio-circle');
+                                        
+                                        if (activeItem) {
+                                            activeItem.style.borderColor = '#7e22ce';
+                                            activeItem.style.boxShadow = '0 2px 8px rgba(126, 34, 206, 0.08)';
+                                            activeItem.querySelector('.faq-accordion-header').style.backgroundColor = '#f5f3ff';
+                                        }
+                                        if (radioCircle) {
+                                            radioCircle.style.borderColor = '#7e22ce';
+                                            radioCircle.style.backgroundColor = '#7e22ce';
+                                        }
+
+                                        if (bundleInput) bundleInput.value = "";
+                                        if (courseInput) courseInput.value = "<?php echo e($formattedTraining['name']); ?>";
+                                        if (courseLabel) courseLabel.value = "<?php echo e($formattedTraining['name']); ?>";
+                                    }
+                                }
+                            </script>
+                        <?php endif; ?>
 
                         <div class="form-group-custom">
                             <label>Formation sélectionnée</label>
@@ -572,6 +720,12 @@
                                 <label for="email">Adresse email *</label>
                                 <input type="email" id="email" name="email" class="form-control-custom" required placeholder="Votre adresse email">
                             </div>
+
+                            <div class="form-group-custom">
+                                <label for="password">Mot de passe étudiant *</label>
+                                <input type="password" id="password" name="password" class="form-control-custom" required minlength="6" placeholder="Créez votre mot de passe (min. 6 caractères)">
+                                <span style="font-size: 0.75rem; color: var(--text-main); margin-top: 0.25rem; display: block; opacity: 0.85;">Ce mot de passe servira à vous connecter à votre Espace Étudiant.</span>
+                            </div>
                         <?php endif; ?>
 
                         <div class="form-group-custom">
@@ -593,7 +747,7 @@
                             <?php if(auth()->guard('client')->check()): ?>
                                 S'inscrire en 1 clic 🚀
                             <?php else: ?>
-                                Confirmer mon inscription
+                                Créer mon compte & m'inscrire 🚀
                             <?php endif; ?>
                         </button>
                     </form>

@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo e(asset('assets/style.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/style.css')); ?>?v=1.0.2">
     <style>
         /* Styles spécifiques pour les Packs de Formations (Violets) */
         .bundle-card {
@@ -186,19 +186,19 @@
                                     <span class="training-location-icon">📚</span> <?php echo e(count($bundle['trainings'])); ?> formations incluses
                                 </div>
                                 <h3 style="color: #283746; font-size: 1.25rem;">Pack : <?php echo e($bundle['name']); ?></h3>
-                                <p class="package-description" style="margin-bottom: 12px; flex: 0 0 auto;"><?php echo e(Str::limit($bundle['description'], 120)); ?></p>
+                                <p class="package-description" style="margin-bottom: 8px; flex: 0 0 auto; line-height: 1.5;"><?php echo e(Str::limit($bundle['description'], 100)); ?></p>
                                 
-                                <!-- Included formations list -->
-                                <div style="margin: 8px 0 16px 0; border-top: 1px dashed rgba(126, 34, 206, 0.15); padding-top: 12px; flex: 1;">
-                                    <span style="font-size: 0.75rem; font-weight: 800; color: #6b21a8; display: block; margin-bottom: 6px; text-transform: uppercase;">Formations incluses :</span>
-                                    <ul style="margin: 0; padding-left: 14px; list-style-type: none;">
+                                <!-- Included formations tags -->
+                                <div style="margin: 8px 0 14px 0; border-top: 1px dashed rgba(126, 34, 206, 0.15); padding-top: 10px; flex: 1;">
+                                    <span style="font-size: 0.7rem; font-weight: 800; color: #6b21a8; display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Modules inclus :</span>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                                         <?php $__currentLoopData = $bundle['trainings']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <li style="font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; position: relative;">
-                                                <span style="position: absolute; left: -14px; color: #7e22ce;">✓</span>
-                                                <strong><?php echo e($t['name']); ?></strong>
-                                            </li>
+                                            <span style="background-color: rgba(126, 34, 206, 0.06); color: #7e22ce; border: 1px solid rgba(126, 34, 206, 0.12); font-size: 0.725rem; padding: 3px 8px; border-radius: 999px; font-weight: 700; display: inline-block; white-space: nowrap;">
+                                                ✓ <?php echo e($t['tag']); ?>
+
+                                            </span>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </ul>
+                                    </div>
                                 </div>
 
                                 <div class="training-action-row" style="border-top: 1px solid var(--line); padding-top: 12px; margin-top: auto;">
@@ -306,7 +306,69 @@
                 </div>
             </div>
         </section>
+
+        
+        <section id="programme" class="section section-alt" style="border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-top: 56px; padding-bottom: 56px;">
+            <div class="container">
+                <div class="section-heading" style="text-align: center; margin: 0 auto 40px;">
+                    <span class="eyebrow" style="color: var(--brand);">Calendrier des sessions</span>
+                    <h2 style="font-family: 'Roboto', sans-serif; font-size: 36px; font-weight: 800; text-transform: uppercase; color: #283746; margin: 10px 0;">Notre Programme & Planning</h2>
+                    <p style="color: var(--muted); max-width: 600px; margin: 0 auto;">Planifiez votre montée en compétences en consultant les dates clés de nos prochaines sessions de formation.</p>
+                </div>
+
+                <div class="timeline">
+                    <?php $isLeft = true; ?>
+                    <?php $__empty_1 = true; $__currentLoopData = $trainings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $training): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <div class="timeline-container <?php echo e($isLeft ? 'left' : 'right'); ?>" data-month="<?php echo e($training['planned_month']); ?>">
+                            <div class="timeline-content">
+                                <span class="timeline-date-chip">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    <?php echo e($training['date']); ?>
+
+                                </span>
+                                <h3 style="margin: 10px 0 10px 0; font-family: 'Roboto', sans-serif; font-size: 1.25rem; font-weight: 800; color: #283746;">
+                                    <?php echo e($training['name']); ?>
+
+                                </h3>
+                                <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">
+                                    <?php echo e(Str::limit($training['description'], 120)); ?>
+
+                                </p>
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px;">
+                                    <span style="font-size: 0.95rem; font-weight: 800; color: var(--text);">
+                                        <?php echo e(number_format($training['promo_price'] ?: $training['price'], 0, ',', ' ')); ?> CFA
+                                    </span>
+                                    <div style="display: flex; gap: 8px;">
+                                        <a href="<?php echo e(route('training.show', $training['id'])); ?>" class="btn btn-secondary btn-compact" style="min-height: 36px; padding: 0 14px; font-size: 0.8rem;">Détails</a>
+                                        <?php if(auth('client')->check()): ?>
+                                            <form action="<?php echo e(route('register')); ?>" method="POST" style="margin: 0; display: inline;">
+                                                <?php echo csrf_field(); ?>
+                                                <input type="hidden" name="course" value="<?php echo e($training['name']); ?>">
+                                                <input type="hidden" name="month" value="<?php echo e($training['planned_month'] ?? 'Juin 2026'); ?>">
+                                                <button type="submit" class="btn btn-primary btn-compact" style="min-height: 36px; padding: 0 14px; font-size: 0.8rem;">S'inscrire</button>
+                                            </form>
+                                        <?php else: ?>
+                                            <a href="<?php echo e(route('student.signup')); ?>" class="btn btn-primary btn-compact" style="min-height: 36px; padding: 0 14px; font-size: 0.8rem;">S'inscrire</a>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php $isLeft = !$isLeft; ?>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                        <p style="text-align: center; color: var(--muted); width: 100%;">Aucun programme planifié pour le moment.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <footer style="background-color: #171312; color: #94a3b8; text-align: center; padding: 3rem 0; margin-top: 5rem; border-top: 1px solid #1e293b;">
+        <div class="container">
+            <p style="margin: 0; font-weight: 700; color: #fff;">Success Business Training</p>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">Formations professionnelles haut de gamme en IA, Business et Marketing.</p>
+        </div>
+    </footer>
 
     <script src="<?php echo e(asset('assets/script.js')); ?>"></script>
 </body>
