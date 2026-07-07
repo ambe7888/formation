@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AdminAuthController extends Controller
 {
     public function showLogin()
     {
-        if (session('admin_logged_in')) {
+        if (Auth::check()) {
             return redirect()->route('admin.dashboard');
         }
 
@@ -22,20 +25,33 @@ class AdminAuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $email = $request->input('email');
-        $password = $request->input('password');
+        $throttleKey = Str::transliterate(Str::lower($request->input('email')) . '|' . $request->ip());
 
-        if ($email === env('ADMIN_EMAIL', 'admin@formation.local') && $password === env('ADMIN_PASSWORD', 'admin123')) {
-            session(['admin_logged_in' => true]);
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return back()->withErrors(['email' => 'Trop de tentatives de connexion. Veuillez réessayer dans ' . $seconds . ' secondes.']);
+        }
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            RateLimiter::clear($throttleKey);
+            $request->session()->regenerate();
             return redirect()->route('admin.dashboard');
         }
+
+        RateLimiter::hit($throttleKey, 300); // Bloque pendant 5 minutes après 5 échecs
 
         return back()->withErrors(['email' => 'Identifiants incorrects.'])->withInput();
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        session()->flush();
+        Auth::logout();
+        
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect()->route('admin.login');
     }
 }

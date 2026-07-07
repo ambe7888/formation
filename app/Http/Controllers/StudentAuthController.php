@@ -53,13 +53,23 @@ class StudentAuthController extends Controller
             'password' => 'required|string',
         ]);
 
+        $throttleKey = \Illuminate\Support\Str::transliterate(\Illuminate\Support\Str::lower($request->input('email')) . '|' . $request->ip());
+
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($throttleKey);
+            return back()->withErrors(['email' => 'Trop de tentatives de connexion. Veuillez réessayer dans ' . $seconds . ' secondes.']);
+        }
+
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
 
         if (auth('client')->attempt($credentials, $remember)) {
+            \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
             $request->session()->regenerate();
             return redirect()->route('student.dashboard');
         }
+
+        \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 300);
 
         return back()->withErrors([
             'email' => 'Les identifiants fournis ne correspondent pas à nos enregistrements.',

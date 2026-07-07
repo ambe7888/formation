@@ -31,6 +31,7 @@
                         <th>Paiement</th>
                         <th>Statut</th>
                         <th>Date</th>
+                        <th class="text-end">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -119,10 +120,31 @@
                                 <?php echo e(optional($registration->created_at)->format('d/m/Y H:i')); ?>
 
                             </td>
+
+                            
+                            <?php
+                                $tTitle = $registration->training ? $registration->training->title : ($registration->bundle ? $registration->bundle->name : 'N/A');
+                                $modalData = json_encode([
+                                    'clientName' => $registration->client->name ?? 'N/A',
+                                    'clientEmail' => $registration->client->email ?? 'N/A',
+                                    'clientPhone' => $registration->client->phone ?? '',
+                                    'trainingTitle' => $tTitle,
+                                    'date' => $registration->created_at->format('d/m/Y'),
+                                    'price' => number_format($registration->amount, 0, ',', ' ') . ' FCFA',
+                                    'paid' => number_format($registration->amount_paid, 0, ',', ' ') . ' FCFA',
+                                    'remaining' => number_format($registration->balance_due, 0, ',', ' ') . ' FCFA',
+                                    'remainingVal' => $registration->balance_due
+                                ]);
+                            ?>
+                            <td class="text-end table-actions">
+                                <button type="button" class="btn btn-sm btn-outline-light" title="Voir les détails" onclick="openRegistrationModal(JSON.parse(this.getAttribute('data-modal')))" data-modal="<?php echo e($modalData); ?>">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
-                            <td colspan="7" style="text-align:center;color:var(--text-3);padding:3rem 1rem;">
+                            <td colspan="8" style="text-align:center;color:var(--text-3);padding:3rem 1rem;">
                                 Aucune inscription active.
                             </td>
                         </tr>
@@ -197,12 +219,29 @@
 
                             </td>
                             <td>
+                                <?php
+                                    $tTitle = $registration->training ? $registration->training->title : ($registration->bundle ? $registration->bundle->name : 'N/A');
+                                    $modalData = json_encode([
+                                        'clientName' => $registration->client->name ?? 'N/A',
+                                        'clientEmail' => $registration->client->email ?? 'N/A',
+                                        'clientPhone' => $registration->client->phone ?? '',
+                                        'trainingTitle' => $tTitle,
+                                        'date' => $registration->created_at->format('d/m/Y'),
+                                        'price' => number_format($registration->amount, 0, ',', ' ') . ' FCFA',
+                                        'paid' => number_format($registration->amount_paid, 0, ',', ' ') . ' FCFA',
+                                        'remaining' => number_format($registration->balance_due, 0, ',', ' ') . ' FCFA',
+                                        'remainingVal' => $registration->balance_due
+                                    ]);
+                                ?>
                                 <form action="<?php echo e(route('admin.registrations.status', $registration)); ?>" method="POST" style="display:inline;">
                                     <?php echo csrf_field(); ?>
                                     <?php echo method_field('PATCH'); ?>
                                     <input type="hidden" name="status" value="pending">
                                     <button type="submit" class="btn btn-sm btn-outline">Réactiver</button>
                                 </form>
+                                <button type="button" class="btn btn-sm btn-outline-light ms-1" title="Voir les détails" onclick="openRegistrationModal(JSON.parse(this.getAttribute('data-modal')))" data-modal="<?php echo e($modalData); ?>">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
                             </td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>

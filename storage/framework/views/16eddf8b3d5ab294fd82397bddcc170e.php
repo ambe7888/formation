@@ -6,7 +6,7 @@
     <title><?php echo $__env->yieldContent('title'); ?> — Admin Formation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- Apply theme BEFORE paint to avoid flash -->
     <script>
@@ -25,35 +25,35 @@
         ══════════════════════════════════════════════════════ */
         :root,
         [data-theme="light"] {
-            --bg-base:      #F1F5F9;
-            --bg-surface:   #FFFFFF;
-            --bg-card:      #FFFFFF;
-            --bg-hover:     #F8FAFC;
-            --border:       #E2E8F0;
-            --border-glow:  rgba(99,102,241,0.35);
-            --primary:      #6366F1;
-            --primary-dim:  rgba(99,102,241,0.1);
-            --accent:       #16A34A;
-            --accent-dim:   rgba(22,163,74,0.1);
+            --bg-base:      #f4efe7;
+            --bg-surface:   #fffaf2;
+            --bg-card:      #ffffff;
+            --bg-hover:     #efe7db;
+            --border:       rgba(30, 27, 24, 0.12);
+            --border-glow:  rgba(15, 118, 110, 0.35);
+            --primary:      #0f766e;
+            --primary-dim:  rgba(15, 118, 110, 0.1);
+            --accent:       #f97316;
+            --accent-dim:   rgba(249, 115, 22, 0.1);
             --warning:      #D97706;
             --warning-dim:  rgba(217,119,6,0.1);
             --danger:       #DC2626;
             --danger-dim:   rgba(220,38,38,0.08);
             --info:         #0284C7;
             --info-dim:     rgba(2,132,199,0.1);
-            --text-1:       #0F172A;
-            --text-2:       #475569;
-            --text-3:       #94A3B8;
-            --shadow-card:  0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
-            --topbar-bg:    rgba(255,255,255,0.9);
+            --text-1:       #1e1b18;
+            --text-2:       #6f665f;
+            --text-3:       #9a8f85;
+            --shadow-card:  0 18px 60px rgba(40, 30, 20, 0.08), 0 4px 16px rgba(0,0,0,0.04);
+            --topbar-bg:    rgba(255,250,242,0.9);
             /* badges light */
-            --badge-success-text: #15803D;
+            --badge-success-text: #0b5b55;
             --badge-warning-text: #B45309;
             --badge-danger-text:  #B91C1C;
             --badge-info-text:    #0369A1;
-            --badge-primary-text: #4338CA;
+            --badge-primary-text: #0b5b55;
             /* alert text */
-            --alert-success-text: #15803D;
+            --alert-success-text: #0b5b55;
             --alert-danger-text:  #B91C1C;
         }
 
@@ -61,33 +61,33 @@
            DARK THEME
         ══════════════════════════════════════════════════════ */
         [data-theme="dark"] {
-            --bg-base:      #020617;
-            --bg-surface:   #0F172A;
-            --bg-card:      #111827;
-            --bg-hover:     #1E293B;
-            --border:       rgba(255,255,255,0.07);
-            --border-glow:  rgba(99,102,241,0.4);
-            --primary:      #6366F1;
-            --primary-dim:  rgba(99,102,241,0.15);
-            --accent:       #22C55E;
-            --accent-dim:   rgba(34,197,94,0.12);
+            --bg-base:      #12100e;
+            --bg-surface:   #1a1715;
+            --bg-card:      #231f1c;
+            --bg-hover:     #2c2724;
+            --border:       rgba(255,255,255,0.08);
+            --border-glow:  rgba(15, 118, 110, 0.4);
+            --primary:      #14b8a6;
+            --primary-dim:  rgba(20, 184, 166, 0.15);
+            --accent:       #fdba74;
+            --accent-dim:   rgba(253, 186, 116, 0.15);
             --warning:      #F59E0B;
             --warning-dim:  rgba(245,158,11,0.12);
             --danger:       #EF4444;
             --danger-dim:   rgba(239,68,68,0.12);
             --info:         #38BDF8;
             --info-dim:     rgba(56,189,248,0.12);
-            --text-1:       #F8FAFC;
-            --text-2:       #94A3B8;
-            --text-3:       #64748B;
+            --text-1:       #fcfaf8;
+            --text-2:       #d0c8c0;
+            --text-3:       #887d74;
             --shadow-card:  0 4px 32px rgba(0,0,0,0.45);
-            --topbar-bg:    rgba(2,6,23,0.85);
-            --badge-success-text: #4ADE80;
+            --topbar-bg:    rgba(26,23,21,0.85);
+            --badge-success-text: #5eead4;
             --badge-warning-text: #FCD34D;
             --badge-danger-text:  #FCA5A5;
             --badge-info-text:    #7DD3FC;
-            --badge-primary-text: #818CF8;
-            --alert-success-text: #4ADE80;
+            --badge-primary-text: #5eead4;
+            --alert-success-text: #5eead4;
             --alert-danger-text:  #FCA5A5;
         }
 
@@ -112,7 +112,7 @@
             height: 100%;
             background: var(--bg-base);
             color: var(--text-1);
-            font-family: 'Fira Sans', sans-serif;
+            font-family: 'Manrope', sans-serif;
             font-size: 15px;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
@@ -176,6 +176,8 @@
             cursor: pointer;
             margin-bottom: 2px;
             border: 1px solid transparent;
+            white-space: nowrap;
+            overflow: hidden;
         }
         .sidebar-link svg { flex-shrink: 0; opacity: 0.65; transition: opacity var(--transition); }
         .sidebar-link:hover { background: var(--bg-hover); color: var(--text-1); }
@@ -194,12 +196,12 @@
             margin: 0 0.75rem 0.75rem;
             padding: 0.65rem 1rem;
             border-radius: 10px;
-            background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #18a39a 100%);
             color: #fff !important;
             font-size: 0.85rem;
             font-weight: 600;
             text-decoration: none;
-            box-shadow: 0 4px 18px rgba(99,102,241,0.3);
+            box-shadow: 0 4px 18px rgba(15, 118, 110, 0.3);
             cursor: pointer;
             transition: opacity 200ms, transform 200ms, box-shadow 200ms !important;
         }
@@ -218,7 +220,7 @@
             background: transparent;
             color: var(--text-2);
             font-size: 0.85rem;
-            font-family: 'Fira Sans', sans-serif;
+            font-family: 'Manrope', sans-serif;
             font-weight: 500;
             cursor: pointer;
         }
@@ -250,12 +252,12 @@
             gap: 0.45rem;
             padding: 0.45rem 0.9rem;
             border-radius: 8px;
-            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            background: linear-gradient(135deg, var(--primary), #18a39a);
             color: #fff !important;
             font-size: 0.8rem;
             font-weight: 600;
             text-decoration: none;
-            box-shadow: 0 3px 12px rgba(99,102,241,0.3);
+            box-shadow: 0 3px 12px rgba(15, 118, 110, 0.3);
             transition: opacity 200ms, transform 200ms !important;
         }
         .topbar-visit-btn:hover { opacity: 0.85; transform: translateY(-1px); }
@@ -297,11 +299,14 @@
 
         /* ─── Tables ───────────────────────────────────────── */
         table { width: 100%; border-collapse: collapse; }
+        thead { background: rgba(0, 0, 0, 0.04); }
+        [data-theme="dark"] thead { background: rgba(255, 255, 255, 0.04); }
         thead th {
-            font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em;
-            text-transform: uppercase; color: var(--text-3);
-            padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); text-align: left;
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;
+            text-transform: uppercase; color: #4b5563;
+            padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); text-align: left;
         }
+        [data-theme="dark"] thead th { color: #9ca3af; }
         tbody td {
             padding: 0.8rem 1rem; border-bottom: 1px solid var(--border);
             color: var(--text-2); font-size: 0.875rem; vertical-align: middle;
@@ -335,24 +340,24 @@
             display: inline-flex; align-items: center; gap: 0.4rem;
             padding: 0.5rem 1rem; border-radius: 8px;
             font-size: 0.85rem; font-weight: 600;
-            font-family: 'Fira Sans', sans-serif;
+            font-family: 'Manrope', sans-serif;
             cursor: pointer; text-decoration: none; border: none;
             transition: all 200ms ease; line-height: 1;
         }
-        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 3px 14px rgba(99,102,241,0.3); }
-        .btn-primary:hover { background: #5254CC; color: #fff; box-shadow: 0 5px 20px rgba(99,102,241,0.45); transform: translateY(-1px); }
-        .btn-success { background: var(--accent); color: #fff; box-shadow: 0 3px 12px rgba(34,197,94,0.25); }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 3px 14px rgba(15,118,110,0.3); }
+        .btn-primary:hover { background: #128B82; color: #fff; box-shadow: 0 5px 20px rgba(15,118,110,0.45); transform: translateY(-1px); }
+        .btn-success { background: var(--accent); color: #fff; box-shadow: 0 3px 12px rgba(249,115,22,0.25); }
         .btn-success:hover { opacity: 0.88; color: #fff; transform: translateY(-1px); }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-2); }
         .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
         .btn-danger-outline { background: transparent; border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent); color: var(--badge-danger-text); }
         .btn-danger-outline:hover { background: var(--danger-dim); }
         .btn-sm { padding: 0.3rem 0.7rem; font-size: 0.78rem; border-radius: 6px; }
-        .btn-outline-primary { background: transparent; border: 1px solid var(--primary); color: var(--primary); display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none; font-family: 'Fira Sans', sans-serif; transition: all 200ms; }
+        .btn-outline-primary { background: transparent; border: 1px solid var(--primary); color: var(--primary); display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none; font-family: 'Manrope', sans-serif; transition: all 200ms; }
         .btn-outline-primary:hover { background: var(--primary-dim); }
-        .btn-outline-light { background: transparent; border: 1px solid var(--border); color: var(--text-2); display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none; font-family: 'Fira Sans', sans-serif; transition: all 200ms; }
+        .btn-outline-light { background: transparent; border: 1px solid var(--border); color: var(--text-2); display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none; font-family: 'Manrope', sans-serif; transition: all 200ms; }
         .btn-outline-light:hover { background: var(--danger-dim); color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
-        .btn-secondary { background: var(--bg-hover); border: 1px solid var(--border); color: var(--text-2); display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none; font-family: 'Fira Sans', sans-serif; transition: all 200ms; }
+        .btn-secondary { background: var(--bg-hover); border: 1px solid var(--border); color: var(--text-2); display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none; font-family: 'Manrope', sans-serif; transition: all 200ms; }
         .btn-secondary:hover { background: var(--border); color: var(--text-1); }
         .w-100 { width: 100%; justify-content: center; }
 
@@ -361,10 +366,10 @@
         .form-control, .form-select {
             width: 100%; background: var(--bg-surface); border: 1px solid var(--border);
             border-radius: 8px; color: var(--text-1); padding: 0.6rem 0.9rem;
-            font-size: 0.875rem; font-family: 'Fira Sans', sans-serif;
+            font-size: 0.875rem; font-family: 'Manrope', sans-serif;
             outline: none; -webkit-appearance: none;
         }
-        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(15,118,110,0.15); }
         .form-control::placeholder { color: var(--text-3); }
         textarea.form-control { resize: vertical; min-height: 100px; }
         .form-check-input { width: 1em; height: 1em; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 3px; cursor: pointer; accent-color: var(--primary); }
@@ -471,6 +476,78 @@
             box-shadow: 0 3px 10px rgba(239,68,68,0.25);
         }
         .btn-danger:hover { opacity: 0.85; color: #fff; transform: translateY(-1px); }
+        .fw-bold { font-weight: 700 !important; }
+        .text-danger { color: var(--danger) !important; }
+        .text-success { color: var(--accent) !important; }
+
+        /* ─── Modal ────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.2s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-container {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
+            width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;
+            transform: translateY(20px); transition: all 0.3s ease;
+            position: relative;
+        }
+        .modal-overlay.active .modal-container { transform: translateY(0); }
+        .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 1.1rem; font-weight: 700; color: var(--text-1); margin: 0; }
+        .modal-close { background: none; border: none; color: var(--text-3); cursor: pointer; transition: color 0.2s; padding: 0.5rem; display: flex; border-radius: 6px; }
+        .modal-close:hover { color: var(--danger); background: var(--danger-dim); }
+        .modal-body { padding: 1.5rem; }
+
+        /* ─── Responsive Sidebar ───────────────────────────── */
+        @media (max-width: 991px) {
+            :root { --sidebar-w: 75px; }
+            .sidebar-brand { padding: 1.5rem 0.5rem 1rem; align-items: center; justify-content: center; text-align: center; }
+            .sidebar-brand-label, .sidebar-brand-title { display: none; }
+            .sidebar-brand::before { 
+                content: 'F'; display: flex; align-items: center; justify-content: center; 
+                width: 36px; height: 36px; border-radius: 10px;
+                background: linear-gradient(135deg, var(--primary) 0%, #18a39a 100%);
+                color: #fff; font-weight: 800; font-size: 1.2rem;
+                box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+            }
+            .sidebar-section-label { text-align: center; color: transparent; height: 1px; margin: 0; padding: 0.5rem 0; }
+            .sidebar-section-label::after { content: '•••'; color: var(--border); display: block; font-size: 1rem; line-height: 0; }
+            
+            .sidebar-link { padding: 0.75rem; justify-content: center; }
+            .sidebar-link .link-text { display: none; }
+            .sidebar-link svg { width: 20px; height: 20px; margin: 0; }
+            
+            .sidebar-visit-btn { padding: 0.75rem; justify-content: center; border-radius: 50%; width: 44px; height: 44px; margin: 0 auto 0.75rem; }
+            .sidebar-visit-btn .link-text, .sidebar-visit-btn .visit-arrow { display: none; }
+            .sidebar-visit-btn svg { width: 20px; height: 20px; margin: 0; }
+            
+            .sidebar-logout-btn { padding: 0.75rem; justify-content: center; border: none; }
+            .sidebar-logout-btn .link-text { display: none; }
+            .sidebar-logout-btn svg { width: 20px; height: 20px; margin: 0; }
+            
+            .admin-topbar { padding: 1rem; }
+        }
+
+        /* ─── JS Tooltip ───────────────────────────────────── */
+        .sidebar-tooltip {
+            position: fixed;
+            background: var(--bg-card); color: var(--text-1);
+            padding: 0.5rem 1rem; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid var(--border);
+            white-space: nowrap; z-index: 9999; font-size: 0.85rem; font-weight: 600;
+            transform: translateY(-50%);
+            opacity: 0; visibility: hidden; transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .sidebar-tooltip.active { opacity: 1; visibility: visible; }
+
+        @media (max-width: 768px) {
+            .topbar-right span { display: none; }
+        }
 
         /* ─── Page fade-in ─────────────────────────────────── */
         @keyframes fadeInUp {
@@ -502,7 +579,7 @@
                         <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
                         <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
                     </svg>
-                    Tableau de bord
+                    <span class="link-text">Tableau de bord</span>
                 </a>
 
                 <div class="sidebar-section-label" style="margin-top:0.5rem;">Contenu</div>
@@ -512,7 +589,7 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
-                    Catégories
+                    <span class="link-text">Catégories</span>
                 </a>
 
                 <a href="<?php echo e(route('admin.trainings')); ?>"
@@ -520,7 +597,7 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                     </svg>
-                    Formations
+                    <span class="link-text">Formations</span>
                 </a>
 
                 <a href="<?php echo e(route('admin.skills')); ?>"
@@ -528,7 +605,7 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                     </svg>
-                    Compétences
+                    <span class="link-text">Compétences</span>
                 </a>
 
                 <a href="<?php echo e(route('admin.bundles')); ?>"
@@ -537,7 +614,7 @@
                         <path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
                         <path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
                     </svg>
-                    Offres Packs
+                    <span class="link-text">Offres Packs</span>
                 </a>
 
                 <div class="sidebar-section-label" style="margin-top:0.5rem;">Clients</div>
@@ -548,7 +625,7 @@
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
-                    Inscriptions
+                    <span class="link-text">Inscriptions</span>
                 </a>
 
                 <a href="<?php echo e(route('admin.payments')); ?>"
@@ -556,18 +633,27 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>
                     </svg>
-                    Paiements
+                    <span class="link-text">Paiements</span>
+                </a>
+
+                <div class="sidebar-section-label" style="margin-top:0.5rem;">Système</div>
+
+                <a href="<?php echo e(route('admin.accounts.index')); ?>"
+                   class="sidebar-link <?php echo e(request()->routeIs('admin.accounts*') ? 'active' : ''); ?>">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    <span class="link-text">Comptes</span>
                 </a>
             </nav>
 
-            <!-- Visit Site -->
             <div style="padding:0 0.75rem;margin-bottom:0.5rem;">
                 <a href="<?php echo e(url('/')); ?>" target="_blank" class="sidebar-visit-btn">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
                     </svg>
-                    Voir le site
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;opacity:0.7">
+                    <span class="link-text">Voir le site</span>
+                    <svg class="visit-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;opacity:0.7">
                         <path d="M7 7h10v10"/><path d="M7 17 17 7"/>
                     </svg>
                 </a>
@@ -580,7 +666,7 @@
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
                         </svg>
-                        Se déconnecter
+                        <span class="link-text">Se déconnecter</span>
                     </button>
                 </form>
             </div>
@@ -593,7 +679,58 @@
                     <div class="topbar-title"><?php echo $__env->yieldContent('title'); ?></div>
                     <div class="topbar-sub">Espace d'administration · Formation Pro</div>
                 </div>
-                <div class="topbar-right">
+                <div class="topbar-right" style="display:flex;align-items:center;">
+                    <!-- Notifications -->
+                    <div class="topbar-notifications" style="position:relative; margin-right:0.75rem;">
+                        <button id="notifToggle" title="Notifications" aria-label="Notifications" style="background:transparent;border:none;cursor:pointer;color:inherit;position:relative;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <?php
+                                $unreadCount = Auth::user()->unreadNotifications->count();
+                            ?>
+                            <?php if($unreadCount > 0): ?>
+                                <span style="position:absolute;top:-2px;right:-2px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 5px;border-radius:10px;line-height:1;">
+                                    <?php echo e($unreadCount); ?>
+
+                                </span>
+                            <?php endif; ?>
+                        </button>
+                        <div id="notifDropdown" style="display:none;position:absolute;top:calc(100% + 10px);right:-10px;width:320px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);z-index:100;overflow:hidden;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg-surface);">
+                                <strong style="font-size:14px;color:var(--text-1);">Notifications</strong>
+                                <?php if($unreadCount > 0): ?>
+                                    <form action="<?php echo e(route('admin.notifications.readAll')); ?>" method="POST" style="margin:0;">
+                                        <?php echo csrf_field(); ?>
+                                        <button type="submit" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:12px;text-decoration:none;font-weight:600;">Tout marquer lu</button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
+                            <div style="max-height:300px;overflow-y:auto;background:var(--bg-card);">
+                                <?php $__empty_1 = true; $__currentLoopData = Auth::user()->unreadNotifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                    <a href="<?php echo e($notification->data['url'] ?? '#'); ?>" style="display:block;padding:12px 16px;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;">
+                                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                                            <strong style="font-size:13px;color:var(--text-1);">
+                                                <?php echo e($notification->data['title'] ?? 'Notification'); ?>
+
+                                            </strong>
+                                            <span style="font-size:11px;color:var(--text-3);"><?php echo e($notification->created_at->diffForHumans()); ?></span>
+                                        </div>
+                                        <div style="font-size:13px;color:var(--text-2);line-height:1.4;">
+                                            <?php echo e($notification->data['message'] ?? ''); ?>
+
+                                        </div>
+                                    </a>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                    <div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px;">
+                                        Aucune nouvelle notification
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Theme Toggle -->
                     <button class="theme-toggle" id="themeToggle" title="Changer le thème" aria-label="Basculer le thème">
                         <!-- Sun icon (light mode) -->
@@ -638,6 +775,21 @@
         </main>
     </div>
 
+    <!-- ── Modal Inscription ─────────────────────────── -->
+    <div class="modal-overlay" id="registrationModal" onclick="closeRegistrationModal(event)">
+        <div class="modal-container" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title">Détails de l'inscription</h3>
+                <button class="modal-close" onclick="closeRegistrationModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body" id="registrationModalBody">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // ── Theme Toggle Logic ─────────────────────────────
         const html    = document.documentElement;
@@ -661,6 +813,81 @@
                 btn.click();
             }
         });
+
+        // ── Modal Logic ────────────────────────────────────
+        const modal = document.getElementById('registrationModal');
+        const modalBody = document.getElementById('registrationModalBody');
+
+        function openRegistrationModal(data) {
+            const content = `
+                <div style="display:flex;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:200px;">
+                        <div class="text-sm text-muted mb-1">Client</div>
+                        <div class="fw-bold text-dark" style="font-size:1.1rem;">${data.clientName}</div>
+                        <div class="text-sm mt-1">${data.clientEmail}</div>
+                        ${data.clientPhone ? `<div class="text-sm">${data.clientPhone}</div>` : ''}
+                    </div>
+                    <div style="flex:1;min-width:200px;">
+                        <div class="text-sm text-muted mb-1">Formation / Pack</div>
+                        <div class="fw-bold text-dark" style="font-size:1.1rem;">${data.trainingTitle}</div>
+                        <div class="text-sm mt-1">Date d'inscription : ${data.date}</div>
+                        <div class="text-sm mt-1">Prix de base : <strong>${data.price}</strong></div>
+                    </div>
+                </div>
+                <div style="background:var(--bg-hover);padding:1.25rem;border-radius:var(--radius);border:1px solid var(--border);">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                        <span class="text-muted">Total payé</span>
+                        <strong class="text-dark">${data.paid}</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;">
+                        <span class="text-muted">Reste à payer</span>
+                        <strong class="${data.remainingVal > 0 ? 'text-danger' : 'text-success'}">${data.remaining}</strong>
+                    </div>
+                </div>
+            `;
+            modalBody.innerHTML = content;
+            modal.classList.add('active');
+        }
+
+        function closeRegistrationModal(e) {
+            if (e && e.target !== modal) return;
+            modal.classList.remove('active');
+        }
+
+        // ── Sidebar Responsive Tooltip ─────────────────────
+        const sbTooltip = document.createElement('div');
+        sbTooltip.className = 'sidebar-tooltip';
+        document.body.appendChild(sbTooltip);
+
+        document.querySelectorAll('.sidebar-link, .sidebar-visit-btn, .sidebar-logout-btn').forEach(el => {
+            el.addEventListener('mouseenter', e => {
+                if(window.innerWidth > 991) return;
+                const textEl = el.querySelector('.link-text');
+                if(!textEl) return;
+                const rect = el.getBoundingClientRect();
+                sbTooltip.innerText = textEl.innerText;
+                sbTooltip.style.top = (rect.top + rect.height/2) + 'px';
+                sbTooltip.style.left = (rect.right + 15) + 'px';
+                sbTooltip.classList.add('active');
+            });
+            el.addEventListener('mouseleave', () => sbTooltip.classList.remove('active'));
+            el.addEventListener('click', () => sbTooltip.classList.remove('active'));
+        });
+
+        // ── Notifications Toggle ───────────────────────────
+        const notifToggle = document.getElementById('notifToggle');
+        const notifDropdown = document.getElementById('notifDropdown');
+        if (notifToggle && notifDropdown) {
+            notifToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notifDropdown.style.display = notifDropdown.style.display === 'none' ? 'block' : 'none';
+            });
+            document.addEventListener('click', (e) => {
+                if (!notifDropdown.contains(e.target)) {
+                    notifDropdown.style.display = 'none';
+                }
+            });
+        }
     </script>
 </body>
 </html>

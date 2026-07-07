@@ -117,7 +117,12 @@
                                             </div>
 
                                             <div class="package-title-row">
-                                                <h3><?php echo e($training['name']); ?></h3>
+                                                <h3>
+                                                    <a href="<?php echo e(isset($training['type']) && $training['type'] === 'bundle' ? route('bundle.show', $training['id']) : route('training.show', $training['id'])); ?>" style="color: inherit; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='inherit'">
+                                                        <?php echo e($training['name']); ?>
+
+                                                    </a>
+                                                </h3>
                                             </div>
 
                                             <p class="package-description"><?php echo e(Str::limit($training['description'], 90)); ?></p>
@@ -185,7 +190,12 @@
                                 <div class="training-location">
                                     <span class="training-location-icon">📚</span> <?php echo e(count($bundle['trainings'])); ?> formations incluses
                                 </div>
-                                <h3 style="color: #283746; font-size: 1.25rem;">Pack : <?php echo e($bundle['name']); ?></h3>
+                                <h3 style="font-size: 1.25rem; margin: 0 0 8px 0;">
+                                    <a href="<?php echo e(route('bundle.show', $bundle['id'])); ?>" style="color: #283746; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='#283746'">
+                                        Pack : <?php echo e($bundle['name']); ?>
+
+                                    </a>
+                                </h3>
                                 <p class="package-description" style="margin-bottom: 8px; flex: 0 0 auto; line-height: 1.5;"><?php echo e(Str::limit($bundle['description'], 100)); ?></p>
                                 
                                 <!-- Included formations tags -->
@@ -269,7 +279,12 @@
                                             <?php echo e($training['location'] ?: 'En ligne'); ?>
 
                                         </div>
-                                        <h3><?php echo e($training['name']); ?></h3>
+                                        <h3>
+                                            <a href="<?php echo e(route('training.show', $training['id'])); ?>" style="color: inherit; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='inherit'">
+                                                <?php echo e($training['name']); ?>
+
+                                            </a>
+                                        </h3>
                                         <p class="package-description"><?php echo e(Str::limit($training['description'], 80)); ?></p>
 
                                         
@@ -326,10 +341,12 @@
                                     <?php echo e($training['date']); ?>
 
                                 </span>
-                                <h3 style="margin: 10px 0 10px 0; font-family: 'Roboto', sans-serif; font-size: 1.25rem; font-weight: 800; color: #283746;">
-                                    <?php echo e($training['name']); ?>
+                                 <h3 style="margin: 10px 0 10px 0; font-family: 'Roboto', sans-serif; font-size: 1.25rem; font-weight: 800;">
+                                     <a href="<?php echo e(route('training.show', $training['id'])); ?>" style="color: #283746; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='#283746'">
+                                         <?php echo e($training['name']); ?>
 
-                                </h3>
+                                     </a>
+                                 </h3>
                                 <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--muted); line-height: 1.5;">
                                     <?php echo e(Str::limit($training['description'], 120)); ?>
 

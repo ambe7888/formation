@@ -134,6 +134,138 @@
     </div>
 </div>
 
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:1.25rem;margin-top:1.25rem;">
+    
+    <div class="card p-0" style="overflow:hidden;">
+        <div class="p-4 border-bottom" style="display:flex;justify-content:space-between;align-items:center;">
+            <h5 class="mb-0">Inscriptions récentes</h5>
+            <a href="<?php echo e(route('admin.registrations')); ?>" class="btn btn-sm btn-outline-light">Voir tout</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th class="border-0 px-4 py-3">Client</th>
+                        <th class="border-0 px-4 py-3">Formation</th>
+                        <th class="border-0 px-4 py-3">Date</th>
+                        <th class="border-0 px-4 py-3 text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php $__empty_1 = true; $__currentLoopData = $recentRegistrations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $reg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <?php
+                        $tTitle = $reg->training ? $reg->training->title : ($reg->bundle ? $reg->bundle->name : 'N/A');
+                        $tPrice = $reg->training ? ($reg->training->promo_price ?? $reg->training->price) : ($reg->bundle ? $reg->bundle->price : 0);
+                        $tPaid = $reg->payments->where('status', 'completed')->sum('amount');
+                        $tRemaining = max(0, $tPrice - $tPaid);
+                        $modalData = json_encode([
+                            'clientName' => $reg->client->name ?? 'N/A',
+                            'clientEmail' => $reg->client->email ?? 'N/A',
+                            'clientPhone' => $reg->client->phone ?? '',
+                            'trainingTitle' => $tTitle,
+                            'date' => $reg->created_at->format('d/m/Y'),
+                            'price' => number_format($tPrice, 0, ',', ' ') . ' FCFA',
+                            'paid' => number_format($tPaid, 0, ',', ' ') . ' FCFA',
+                            'remaining' => number_format($tRemaining, 0, ',', ' ') . ' FCFA',
+                            'remainingVal' => $tRemaining
+                        ]);
+                    ?>
+                    <tr style="cursor: pointer;" onclick="document.getElementById('btn-modal-<?php echo e($reg->id); ?>').click()">
+                        <td class="px-4 py-3 fw-bold"><?php echo e($reg->client->name ?? 'Inconnu'); ?></td>
+                        <td class="px-4 py-3 text-muted"><?php echo e(Str::limit($tTitle, 30)); ?></td>
+                        <td class="px-4 py-3 text-muted"><?php echo e($reg->created_at->format('d/m/Y')); ?></td>
+                        <td class="px-4 py-3 text-end table-actions">
+                            <button type="button" id="btn-modal-<?php echo e($reg->id); ?>" class="btn btn-sm btn-outline-light" title="Voir les détails" onclick="event.stopPropagation(); openRegistrationModal(JSON.parse(this.getAttribute('data-modal')))" data-modal="<?php echo e($modalData); ?>">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </td>
+                    </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <tr><td colspan="4" class="text-center p-4 text-muted">Aucune inscription.</td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    
+    <div class="card p-0" style="overflow:hidden;">
+        <div class="p-4 border-bottom" style="display:flex;justify-content:space-between;align-items:center;">
+            <h5 class="mb-0">Derniers paiements</h5>
+            <a href="<?php echo e(route('admin.payments')); ?>" class="btn btn-sm btn-outline-light">Voir tout</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th class="border-0 px-4 py-3">Client</th>
+                        <th class="border-0 px-4 py-3">Montant</th>
+                        <th class="border-0 px-4 py-3">Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php $__empty_1 = true; $__currentLoopData = $recentPayments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pay): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <tr>
+                        <td class="px-4 py-3 fw-bold"><?php echo e($pay->registration->client->name ?? 'Inconnu'); ?></td>
+                        <td class="px-4 py-3"><?php echo e(number_format($pay->amount, 0, ',', ' ')); ?> FCFA</td>
+                        <td class="px-4 py-3">
+                            <?php if($pay->status === 'completed'): ?>
+                                <span class="badge badge-success">Payé</span>
+                            <?php elseif($pay->status === 'pending'): ?>
+                                <span class="badge badge-warning">En attente</span>
+                            <?php else: ?>
+                                <span class="badge badge-danger">Échoué</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <tr><td colspan="3" class="text-center p-4 text-muted">Aucun paiement récent.</td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr;gap:1.25rem;margin-top:1.25rem;">
+    
+    <div class="card p-0" style="overflow:hidden;">
+        <div class="p-4 border-bottom" style="display:flex;justify-content:space-between;align-items:center;">
+            <h5 class="mb-0">Paiements en attente</h5>
+            <a href="<?php echo e(route('admin.payments')); ?>" class="btn btn-sm btn-outline-light">Voir tout</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th class="border-0 px-4 py-3">Date</th>
+                        <th class="border-0 px-4 py-3">Client</th>
+                        <th class="border-0 px-4 py-3">Montant</th>
+                        <th class="border-0 px-4 py-3">Méthode</th>
+                        <th class="border-0 px-4 py-3 text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php $__empty_1 = true; $__currentLoopData = $pendingPayments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pay): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <tr>
+                        <td class="px-4 py-3 text-muted"><?php echo e($pay->created_at->format('d/m/Y H:i')); ?></td>
+                        <td class="px-4 py-3 fw-bold"><?php echo e($pay->registration->client->name ?? 'Inconnu'); ?></td>
+                        <td class="px-4 py-3"><?php echo e(number_format($pay->amount, 0, ',', ' ')); ?> FCFA</td>
+                        <td class="px-4 py-3"><?php echo e(ucfirst($pay->method)); ?></td>
+                        <td class="px-4 py-3 text-end table-actions">
+                            <a href="<?php echo e(route('admin.payments')); ?>" class="btn btn-sm btn-primary">Traiter</a>
+                        </td>
+                    </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <tr><td colspan="5" class="text-center p-4 text-muted">Aucun paiement en attente.</td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('admin.layout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\formation\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>

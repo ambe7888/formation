@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminAccountController;
 use App\Http\Controllers\HomeController;
 
 Route::get('/', [HomeController::class, 'index']);
@@ -19,6 +20,13 @@ Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admi
 // Admin routes
 Route::prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+
+    Route::post('/notifications/read-all', [AdminController::class, 'markNotificationsAsRead'])->name('admin.notifications.readAll');
+
+    // Admin Accounts
+    Route::resource('accounts', AdminAccountController::class)->except(['show'])->names('admin.accounts');
+    
+
     Route::get('/categories', [AdminController::class, 'categories'])->name('admin.categories');
     Route::get('/categories/create', [AdminController::class, 'createCategory'])->name('admin.categories.create');
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
@@ -39,6 +47,7 @@ Route::prefix('admin')->group(function () {
 
     Route::get('/payments', [AdminController::class, 'payments'])->name('admin.payments');
     Route::post('/payments', [AdminController::class, 'storePayment'])->name('admin.payments.store');
+    Route::patch('/payments/{payment}/status', [AdminController::class, 'updatePaymentStatus'])->name('admin.payments.status');
 
     Route::get('/skills', [AdminController::class, 'skills'])->name('admin.skills');
     Route::post('/skills', [AdminController::class, 'storeSkill'])->name('admin.skills.store');
@@ -67,6 +76,7 @@ Route::post('/logout', [\App\Http\Controllers\StudentAuthController::class, 'log
 
 Route::middleware(['web'])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\StudentDashboardController::class, 'index'])->name('student.dashboard');
+    Route::post('/dashboard/notifications/read-all', [\App\Http\Controllers\StudentDashboardController::class, 'markNotificationsAsRead'])->name('student.notifications.readAll');
     Route::post('/dashboard/payments', [\App\Http\Controllers\StudentDashboardController::class, 'storePaymentDeclaration'])->name('student.payments.declare');
     Route::delete('/dashboard/registrations/{registration}', [\App\Http\Controllers\StudentDashboardController::class, 'destroyRegistration'])->name('student.registrations.destroy');
 });

@@ -8,17 +8,19 @@
     <link rel="stylesheet" href="{{ asset('assets/style.css') }}?v=1.0.2">
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-dark: #3730a3;
-            --primary-soft: rgba(79, 70, 229, 0.1);
-            --dark: #0f172a;
-            --light-bg: #f8fafc;
-            --border-color: #e2e8f0;
-            --text-main: #334155;
-            --text-dark: #0f172a;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            --primary: #0f766e;
+            --primary-dark: #0b5b55;
+            --primary-soft: rgba(15, 118, 110, 0.1);
+            --dark: #1e1b18;
+            --light-bg: #f4efe7;
+            --border-color: rgba(30, 27, 24, 0.12);
+            --text-main: #6f665f;
+            --text-dark: #1e1b18;
+            --success: #0b5b55;
+            --warning: #D97706;
+            --danger: #DC2626;
+            --bg-surface: #fffaf2;
+            --text-muted: #9a8f85;
         }
 
         body {
@@ -31,7 +33,7 @@
 
         /* Top navigation header */
         .dashboard-header {
-            background: #ffffff;
+            background: var(--bg-surface);
             box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
@@ -85,16 +87,65 @@
         }
 
         .logout-btn:hover {
-            background: #f1f5f9;
+            background: var(--primary-soft);
             color: var(--danger);
-            border-color: #fca5a5;
+            border-color: var(--danger);
+        }
+
+        /* Sidebar Styles */
+        .student-sidebar {
+            width: 260px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 200;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-brand { padding: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .sidebar-nav { flex: 1; padding: 1rem 0.75rem; overflow-y: auto; }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem 1rem; color: var(--text-main);
+            text-decoration: none; border-radius: 0.5rem;
+            font-weight: 600; margin-bottom: 0.25rem;
+            transition: all 0.2s;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+        .sidebar-footer { padding: 1rem; border-top: 1px solid var(--border-color); }
+
+        .sidebar-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 150;
+        }
+
+        @media (max-width: 991px) {
+            .student-sidebar { transform: translateX(-100%); }
+            .student-sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+            .student-main { margin-left: 0 !important; }
         }
 
         /* Main Workspace container */
+        .student-main {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--light-bg);
+            transition: margin-left 0.3s ease;
+        }
         .dashboard-container {
             max-width: 1200px;
-            margin: 3rem auto;
+            margin: 2rem auto;
             padding: 0 1.5rem;
+            width: 100%;
             box-sizing: border-box;
         }
 
@@ -107,7 +158,7 @@
         }
 
         .summary-card {
-            background: #ffffff;
+            background: var(--bg-card);
             border-radius: 1.25rem;
             box-shadow: 0 10px 25px rgba(15, 23, 42, 0.02);
             border: 1px solid var(--border-color);
@@ -133,7 +184,7 @@
         .summary-label {
             font-size: 0.85rem;
             font-weight: 700;
-            color: #64748b;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.03em;
             margin-bottom: 0.5rem;
@@ -335,7 +386,7 @@
             border: 1px solid var(--border-color);
             font-family: inherit;
             box-sizing: border-box;
-            background: #ffffff;
+            background: var(--bg-card);
             color: var(--text-dark);
         }
 
@@ -363,7 +414,7 @@
         .btn-cancel {
             background: none;
             border: none;
-            color: #64748b;
+            color: var(--text-muted);
             cursor: pointer;
             font-weight: 600;
             font-size: 0.85rem;
@@ -384,28 +435,108 @@
             font-weight: 600;
             font-size: 0.9rem;
         }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body>
+<body style="margin: 0; padding: 0;">
 
-    <!-- Header navigation bar -->
-    <header class="dashboard-header">
-        <div class="header-container">
-            <a href="{{ url('/') }}" class="logo">
-                <span>Success</span> Business Training
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <aside class="student-sidebar" id="studentSidebar">
+        <div class="sidebar-brand">
+            <a href="{{ url('/') }}" class="logo" style="font-size: 1.1rem;">
+                <span>Success</span> Training
             </a>
-            <div class="user-nav">
-                <span class="user-name">🧑‍🎓 {{ $client->name }}</span>
-                <form action="{{ route('student.logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="logout-btn">Se déconnecter</button>
-                </form>
-            </div>
         </div>
-    </header>
+        <nav class="sidebar-nav">
+            <a href="#" class="sidebar-link active" onclick="switchTab(event, 'overview')">📊 Vue d'ensemble</a>
+            <a href="#" class="sidebar-link" onclick="switchTab(event, 'formations')">📚 Mes Formations</a>
+            <a href="#" class="sidebar-link" onclick="switchTab(event, 'catalogue')">💳 Voir le Catalogue</a>
+        </nav>
+        <div class="sidebar-footer">
+            <form action="{{ route('student.logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="logout-btn" style="width: 100%;">Déconnexion</button>
+            </form>
+        </div>
+    </aside>
 
-    <!-- Main Workspace container -->
-    <main class="dashboard-container">
+    <div class="student-main">
+        <!-- Header navigation bar -->
+        <header class="dashboard-header">
+            <div class="header-container" style="justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="d-lg-none" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; display: none;" id="sidebarToggleBtn" onclick="toggleSidebar()">☰</button>
+                    <div style="font-weight: 700; color: var(--text-dark);">Espace Étudiant</div>
+                </div>
+                
+                <div class="user-nav">
+                    <!-- Notifications -->
+                    <div style="position:relative; margin-right:1rem;">
+                        <button id="notifToggle" title="Notifications" aria-label="Notifications" style="background:transparent;border:none;cursor:pointer;color:inherit;position:relative;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            @php
+                                $unreadCount = Auth::guard('client')->user()->unreadNotifications->count();
+                            @endphp
+                            @if($unreadCount > 0)
+                                <span style="position:absolute;top:-2px;right:-2px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 5px;border-radius:10px;line-height:1;">
+                                    {{ $unreadCount }}
+                                </span>
+                            @endif
+                        </button>
+                        <div id="notifDropdown" style="display:none;position:absolute;top:calc(100% + 10px);right:-10px;width:300px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.1);z-index:100;overflow:hidden;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border-color);background:var(--bg-surface);">
+                                <strong style="font-size:14px;color:var(--text-dark);">Notifications</strong>
+                                @if($unreadCount > 0)
+                                    <form action="{{ route('student.notifications.readAll') }}" method="POST" style="margin:0;">
+                                        @csrf
+                                        <button type="submit" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:12px;text-decoration:none;font-weight:600;">Tout marquer lu</button>
+                                    </form>
+                                @endif
+                            </div>
+                            <div style="max-height:300px;overflow-y:auto;background:var(--bg-card);">
+                                @forelse(Auth::guard('client')->user()->unreadNotifications as $notification)
+                                    <a href="{{ $notification->data['url'] ?? '#' }}" style="display:block;padding:12px 16px;border-bottom:1px solid var(--border-color);text-decoration:none;color:inherit;">
+                                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                                            <strong style="font-size:13px;color:var(--text-dark);">
+                                                {{ $notification->data['title'] ?? 'Notification' }}
+                                            </strong>
+                                            <span style="font-size:11px;color:var(--text-muted);">{{ $notification->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        <div style="font-size:13px;color:var(--text-muted);line-height:1.4;">
+                                            {{ $notification->data['message'] ?? '' }}
+                                        </div>
+                                    </a>
+                                @empty
+                                    <div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;">
+                                        Aucune nouvelle notification
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+
+                    <span class="user-name">🧑‍🎓 {{ $client->name }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace container -->
+        <main class="dashboard-container">
         
         @if(session('success'))
             <div class="alert-success">
@@ -424,28 +555,56 @@
             $totalInscriptions = $registrations->count();
         @endphp
 
-        <!-- Financial tiles -->
-        <div class="summary-grid">
-            <div class="summary-card">
-                <div class="summary-label">Formations Inscrites</div>
-                <div class="summary-value">{{ $totalInscriptions }}</div>
+        <!-- TAB 1: OVERVIEW -->
+        <div id="overview" class="tab-content active">
+            <!-- Educational/Progress tiles -->
+            <h3 style="font-size: 1.1rem; color: var(--text-dark); margin-bottom: 1rem;">Mon Parcours</h3>
+            <div class="summary-grid" style="margin-bottom: 2rem;">
+                <div class="summary-card">
+                    <div class="summary-label">Formations en cours</div>
+                    <div class="summary-value">{{ $stats['en_cours'] }}</div>
+                </div>
+                <div class="summary-card" style="border-left-color: var(--accent);">
+                    <div class="summary-label">Formations à venir</div>
+                    <div class="summary-value">{{ $stats['a_venir'] }}</div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="summary-label">Paiements en attente</div>
+                    <div class="summary-value">{{ $stats['paiements_attente'] }}</div>
+                </div>
+                <div class="summary-card danger">
+                    <div class="summary-label">Paiements en retard</div>
+                    <div class="summary-value">{{ $stats['paiements_retard'] }}</div>
+                </div>
             </div>
-            <div class="summary-card success">
-                <div class="summary-label">Total versé (CFA)</div>
-                <div class="summary-value">{{ number_format($totalPayé, 0, ',', ' ') }} CFA</div>
-            </div>
-            <div class="summary-card warning">
-                <div class="summary-label">Total restant dû (CFA)</div>
-                <div class="summary-value">{{ number_format($totalReste, 0, ',', ' ') }} CFA</div>
-            </div>
-            <div class="summary-card danger">
-                <div class="summary-label">Solde global de facturation</div>
-                <div class="summary-value">{{ number_format($totalDû, 0, ',', ' ') }} CFA</div>
-            </div>
-        </div>
 
-        <!-- Inscriptions listings -->
-        <h2 class="dashboard-section-title">Mes Formations</h2>
+            <!-- Financial tiles -->
+            <h3 style="font-size: 1.1rem; color: var(--text-dark); margin-bottom: 1rem;">Ma Facturation</h3>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-label">Formations Inscrites</div>
+                    <div class="summary-value">{{ $totalInscriptions }}</div>
+                </div>
+                <div class="summary-card success">
+                    <div class="summary-label">Total versé (CFA)</div>
+                    <div class="summary-value">{{ number_format($totalPayé, 0, ',', ' ') }} CFA</div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="summary-label">Total restant dû (CFA)</div>
+                    <div class="summary-value">{{ number_format($totalReste, 0, ',', ' ') }} CFA</div>
+                </div>
+                <div class="summary-card danger">
+                    <div class="summary-label">Solde global de facturation</div>
+                    <div class="summary-value">{{ number_format($totalDû, 0, ',', ' ') }} CFA</div>
+                </div>
+            </div>
+
+        </div> <!-- End Overview Tab -->
+
+        <!-- TAB 2: FORMATIONS -->
+        <div id="formations" class="tab-content">
+            <!-- Inscriptions listings -->
+        <h2 class="dashboard-section-title" id="formations">Mes Formations</h2>
 
         @forelse($registrations as $reg)
             @php
@@ -461,9 +620,9 @@
                     <!-- Training/Bundle General Parameters -->
                     <div class="training-info">
                         @if($reg->bundle_id)
-                            <h3 style="color: #7e22ce; margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 800;">🎁 Pack : {{ optional($reg->bundle)->name ?? 'N/A' }}</h3>
+                            <h3 style="color: var(--primary); margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 800;">🎁 Pack : {{ optional($reg->bundle)->name ?? 'N/A' }}</h3>
                             <div class="training-meta">
-                                <span style="background-color: #f3e8ff; color: #6b21a8; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">📚 Inclus : {{ optional($reg->bundle)->trainings->pluck('title')->implode(', ') }}</span>
+                                <span style="background-color: var(--primary-soft); color: var(--primary-dark); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">📚 Inclus : {{ optional($reg->bundle)->trainings->pluck('title')->implode(', ') }}</span>
                             </div>
                         @else
                             <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 800;">{{ optional($reg->training)->title ?? 'N/A' }}</h3>
@@ -579,20 +738,20 @@
                             }
                         }
                     @endphp
-                    <div class="payments-log" style="background-color: #f5f3ff; border: 1px solid #ddd6fe; margin-top: 1.5rem;">
-                        <div class="log-title" style="color: #4f46e5; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                    <div class="payments-log" style="background-color: var(--primary-soft); border: 1px solid var(--border-color); margin-top: 1.5rem;">
+                        <div class="log-title" style="color: var(--primary); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
                             <span>📁</span> Supports & Ressources de cours
                         </div>
                         @if($resources->isNotEmpty())
                             <ul style="list-style: none; padding: 0; margin: 0;">
                                 @foreach($resources as $resource)
-                                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: #ffffff; border-radius: 0.5rem; margin-bottom: 0.75rem; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02); border: 1px solid #e2e8f0;">
+                                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--bg-card); border-radius: 0.5rem; margin-bottom: 0.75rem; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02); border: 1px solid var(--border-color);">
                                         <div>
                                             <strong style="display: block; color: var(--text-dark); font-size: 0.9rem;">
                                                 @if($resource->type === 'file') 📄 @else 🔗 @endif {{ $resource->title }}
                                             </strong>
                                             @if($resource->description)
-                                                <small style="color: #64748b; display: block; margin-top: 0.25rem;">{{ $resource->description }}</small>
+                                                <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">{{ $resource->description }}</small>
                                             @endif
                                         </div>
                                         <a href="{{ $resource->url }}" target="_blank" class="btn-declare" style="text-decoration: none; font-size: 0.8rem; padding: 0.4rem 0.8rem;">
@@ -606,7 +765,7 @@
                         @endif
                     </div>
                 @else
-                    <div class="payments-log" style="background-color: #fafaf9; border: 1px dashed #d6d3d1; margin-top: 1.5rem;">
+                    <div class="payments-log" style="background-color: var(--bg-surface); border: 1px dashed var(--border-color); margin-top: 1.5rem;">
                         <p class="text-muted small" style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
                              <span>🔒</span> Vos supports de cours (PDF, liens de visioconférence) seront débloqués automatiquement dès la validation de votre versement et la confirmation de votre inscription par l'administration.
                         </p>
@@ -662,14 +821,113 @@
                 </div>
             </div>
         @endforelse
+        </div> <!-- End Formations Tab -->
+
+        <!-- TAB 3: CATALOGUE -->
+        <div id="catalogue" class="tab-content">
+            <h2 class="dashboard-section-title">Catalogue des Formations</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                @foreach($allTrainings as $training)
+                    <div class="summary-card" style="padding: 1.25rem; border-left: 4px solid var(--primary); display: flex; flex-direction: column; gap: 1rem;">
+                        <div>
+                            <h3 style="font-size: 1.1rem; color: var(--text-dark); margin: 0 0 0.5rem 0;">{{ $training->title }}</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ strip_tags($training->description) }}</p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                            <span style="font-weight: 800; color: var(--primary); font-size: 1.1rem;">{{ number_format($training->price, 0, ',', ' ') }} CFA</span>
+                            <a href="{{ url('/formations/'.$training->id) }}" target="_blank" class="btn-submit-payment" style="text-decoration: none; padding: 0.5rem 1rem;">Détails</a>
+                        </div>
+                    </div>
+                @endforeach
+                
+                @foreach($allBundles as $bundle)
+                    <div class="summary-card" style="padding: 1.25rem; border-left: 4px solid var(--accent); display: flex; flex-direction: column; gap: 1rem;">
+                        <div>
+                            <div style="font-size: 0.7rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 0.3rem;">Pack Spécial</div>
+                            <h3 style="font-size: 1.1rem; color: var(--text-dark); margin: 0 0 0.5rem 0;">{{ $bundle->name }}</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ strip_tags($bundle->description) }}</p>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                            <span style="font-weight: 800; color: var(--primary); font-size: 1.1rem;">{{ number_format($bundle->price, 0, ',', ' ') }} CFA</span>
+                            <a href="{{ url('/packs/'.$bundle->id) }}" target="_blank" class="btn-submit-payment" style="background: var(--accent); text-decoration: none; padding: 0.5rem 1rem;">Détails</a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div> <!-- End Catalogue Tab -->
 
     </main>
+    </div> <!-- End student-main -->
 
     <script>
         function toggleForm(id) {
             const form = document.getElementById('form-' + id);
             if (form) {
                 form.classList.toggle('active');
+            }
+        }
+
+        // Sidebar logic
+        function toggleSidebar() {
+            const sidebar = document.getElementById('studentSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        // Show hamburger on mobile
+        if (window.innerWidth <= 991) {
+            document.getElementById('sidebarToggleBtn').style.display = 'block';
+        }
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 991) {
+                document.getElementById('sidebarToggleBtn').style.display = 'block';
+            } else {
+                document.getElementById('sidebarToggleBtn').style.display = 'none';
+                document.getElementById('studentSidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+        });
+
+        document.getElementById('notifToggle').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('notifDropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('notifDropdown');
+            if (dropdown && dropdown.style.display === 'block' && !e.target.closest('#notifDropdown') && !e.target.closest('#notifToggle')) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        function switchTab(event, tabId) {
+            event.preventDefault();
+
+            // 1. Remove active class from all links
+            const links = document.querySelectorAll('.sidebar-link');
+            links.forEach(link => {
+                // Ignore the catalogue link which doesn't have an onclick with switchTab
+                if(link.getAttribute('href') === '#') {
+                    link.classList.remove('active');
+                }
+            });
+
+            // 2. Add active class to clicked link
+            event.currentTarget.classList.add('active');
+
+            // 3. Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // 4. Show the selected tab
+            document.getElementById(tabId).classList.add('active');
+
+            // 5. If on mobile, close the sidebar after clicking
+            if (window.innerWidth <= 1024) {
+                toggleSidebar();
             }
         }
     </script>

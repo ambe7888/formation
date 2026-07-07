@@ -10,13 +10,14 @@ use App\Models\Skill;
 use App\Models\Bundle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (!session('admin_logged_in')) {
+            if (!Auth::check()) {
                 return redirect()->route('admin.login');
             }
 
@@ -32,7 +33,20 @@ class AdminController extends Controller
         $payments = Payment::count();
         $categories = Category::orderBy('sort_order')->get();
 
-        return view('admin.dashboard', compact('activeTrainings', 'featuredTrainings', 'registrations', 'payments', 'categories'));
+        $recentRegistrations = Registration::with(['client', 'training', 'bundle', 'payments'])->orderByDesc('created_at')->take(5)->get();
+        $pendingPayments = Payment::with(['registration.client'])->where('status', 'pending')->orderByDesc('created_at')->take(5)->get();
+        $recentPayments = Payment::with(['registration.client'])->orderByDesc('created_at')->take(5)->get();
+
+        return view('admin.dashboard', compact(
+            'activeTrainings', 
+            'featuredTrainings', 
+            'registrations', 
+            'payments', 
+            'categories',
+            'recentRegistrations',
+            'pendingPayments',
+            'recentPayments'
+        ));
     }
 
     public function trainings()
@@ -90,11 +104,20 @@ class AdminController extends Controller
         $resourceDescriptions = $request->input('resource_description', []);
 
         foreach ($resourceTitles as $i => $title) {
-            if (!empty($title) && !empty($resourceUrls[$i])) {
+            $type = $resourceTypes[$i] ?? 'link';
+            $url = $resourceUrls[$i] ?? '';
+            
+            if (in_array($type, ['file', 'video']) && $request->hasFile("resource_file.$i")) {
+                $url = $request->file("resource_file.$i")->store('resources', 'public');
+            } elseif (in_array($type, ['file', 'video']) && !empty($request->input("resource_old_file.$i"))) {
+                $url = $request->input("resource_old_file.$i");
+            }
+
+            if (!empty($title) && !empty($url)) {
                 $training->resources()->create([
                     'title' => $title,
-                    'type' => $resourceTypes[$i] ?? 'link',
-                    'url' => $resourceUrls[$i],
+                    'type' => $type,
+                    'url' => $url,
                     'description' => $resourceDescriptions[$i] ?? null,
                 ]);
             }
@@ -153,11 +176,20 @@ class AdminController extends Controller
         $resourceDescriptions = $request->input('resource_description', []);
 
         foreach ($resourceTitles as $i => $title) {
-            if (!empty($title) && !empty($resourceUrls[$i])) {
+            $type = $resourceTypes[$i] ?? 'link';
+            $url = $resourceUrls[$i] ?? '';
+            
+            if (in_array($type, ['file', 'video']) && $request->hasFile("resource_file.$i")) {
+                $url = $request->file("resource_file.$i")->store('resources', 'public');
+            } elseif (in_array($type, ['file', 'video']) && !empty($request->input("resource_old_file.$i"))) {
+                $url = $request->input("resource_old_file.$i");
+            }
+
+            if (!empty($title) && !empty($url)) {
                 $training->resources()->create([
                     'title' => $title,
-                    'type' => $resourceTypes[$i] ?? 'link',
-                    'url' => $resourceUrls[$i],
+                    'type' => $type,
+                    'url' => $url,
                     'description' => $resourceDescriptions[$i] ?? null,
                 ]);
             }
@@ -316,6 +348,25 @@ class AdminController extends Controller
             'notes' => json_encode($notes, JSON_UNESCAPED_UNICODE)
         ]);
 
+        try {
+            $client = $registration->client;
+            $courseName = $registration->training ? $registration->training->title : ($registration->bundle ? $registration->bundle->name : 'une formation');
+            $msg = '';
+            if ($status === 'confirmed') {
+                $msg = 'Votre inscription à ' . $courseName . ' a été confirmée ! Vous avez maintenant accès aux supports de cours.';
+            } elseif ($status === 'canceled') {
+                $msg = 'Votre inscription à ' . $courseName . ' a été annulée.';
+            }
+            if ($msg) {
+                $client->notify(new \App\Notifications\ClientNotification(
+                    'Mise à jour inscription',
+                    $msg,
+                    route('student.dashboard'),
+                    $status === 'confirmed' ? 'bi-check-circle' : 'bi-x-circle'
+                ));
+            }
+        } catch (\Exception $e) {}
+
         return redirect()->route('admin.registrations')->with('success', 'Statut de l\'inscription mis à jour avec succès.');
      }
 
@@ -329,7 +380,7 @@ class AdminController extends Controller
              'reference' => 'nullable|string|max:255',
          ]);
 
-         Payment::create([
+         $payment = Payment::create([
              'registration_id' => $request->input('registration_id'),
              'amount' => $request->input('amount'),
              'method' => $request->input('method'),
@@ -338,7 +389,52 @@ class AdminController extends Controller
              'paid_at' => $request->input('status') === 'completed' ? now() : null,
          ]);
 
+         if ($payment->status === 'completed' && $payment->registration && $payment->registration->client) {
+             try {
+                 $payment->registration->client->notify(new \App\Notifications\ClientNotification(
+                     'Paiement enregistré',
+                     'Un paiement de ' . number_format($payment->amount, 0, ',', ' ') . ' CFA a été enregistré sur votre compte.',
+                     route('student.dashboard'),
+                     'bi-cash'
+                 ));
+             } catch (\Exception $e) {}
+         }
+
          return redirect()->route('admin.payments')->with('success', 'Paiement enregistré avec succès.');
+     }
+
+     public function updatePaymentStatus(Request $request, Payment $payment)
+     {
+         $request->validate([
+             'status' => 'required|in:pending,completed,failed',
+         ]);
+
+         $payment->update([
+             'status' => $request->input('status'),
+             'paid_at' => $request->input('status') === 'completed' ? now() : null,
+         ]);
+
+         if ($payment->registration && $payment->registration->client) {
+             try {
+                 $msg = '';
+                 if ($payment->status === 'completed') {
+                     $msg = 'Votre paiement de ' . number_format($payment->amount, 0, ',', ' ') . ' CFA a été validé !';
+                 } elseif ($payment->status === 'failed') {
+                     $msg = 'Votre paiement de ' . number_format($payment->amount, 0, ',', ' ') . ' CFA a échoué ou a été rejeté.';
+                 }
+
+                 if ($msg) {
+                     $payment->registration->client->notify(new \App\Notifications\ClientNotification(
+                         'Mise à jour paiement',
+                         $msg,
+                         route('student.dashboard'),
+                         $payment->status === 'completed' ? 'bi-check-circle' : 'bi-x-circle'
+                     ));
+                 }
+             } catch (\Exception $e) {}
+         }
+
+         return redirect()->route('admin.payments')->with('success', 'Statut du paiement mis à jour avec succès.');
      }
 
     public function skills()
@@ -495,5 +591,11 @@ class AdminController extends Controller
         $file->move($destination, $filename);
 
         return 'assets/images/bundles/' . $filename;
+    }
+
+    public function markNotificationsAsRead()
+    {
+        Auth::user()->unreadNotifications->markAsRead();
+        return back();
     }
 }

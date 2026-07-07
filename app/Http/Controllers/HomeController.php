@@ -382,6 +382,8 @@ class HomeController extends Controller
 
         $request->validate($rules);
 
+        $safeRedirectTo = $this->getSafeRedirectUrl($request->input('redirect_to'));
+
         if (auth('client')->check()) {
             $client = auth('client')->user();
         } else {
@@ -389,8 +391,8 @@ class HomeController extends Controller
             $emailExists = Client::where('email', $request->input('email'))->exists();
             if ($emailExists) {
                 $errMsg = 'Cette adresse email est déjà enregistrée. Veuillez vous connecter.';
-                if ($request->has('redirect_to')) {
-                    return redirect($request->input('redirect_to'))->with('error', $errMsg);
+                if ($safeRedirectTo) {
+                    return redirect($safeRedirectTo)->with('error', $errMsg);
                 }
                 return redirect()->route('student.login')->with('error', $errMsg);
             }
@@ -418,8 +420,8 @@ class HomeController extends Controller
                 ->exists();
                 
             if ($exists) {
-                if ($request->has('redirect_to')) {
-                    return redirect($request->input('redirect_to') . '?status=duplicate&course=' . urlencode($bundle->name));
+                if ($safeRedirectTo) {
+                    return redirect($safeRedirectTo . '?status=duplicate&course=' . urlencode($bundle->name));
                 }
                 return redirect(url('/').'?status=duplicate&course=' . urlencode($bundle->name) . '#inscription');
             }
@@ -439,8 +441,20 @@ class HomeController extends Controller
                 ], JSON_UNESCAPED_UNICODE),
             ]);
             
-            if ($request->has('redirect_to')) {
-                return redirect($request->input('redirect_to') . '?status=success&course=' . urlencode($bundle->name));
+            try {
+                \Illuminate\Support\Facades\Notification::send(
+                    \App\Models\User::all(),
+                    new \App\Notifications\AdminNotification(
+                        'Nouvelle inscription',
+                        $client->name . ' s\'est inscrit au pack ' . $bundle->name,
+                        route('admin.registrations'),
+                        'bi-person-plus'
+                    )
+                );
+            } catch (\Exception $e) {}
+            
+            if ($safeRedirectTo) {
+                return redirect($safeRedirectTo . '?status=success&course=' . urlencode($bundle->name));
             }
             return redirect()->route('student.dashboard')->with('success', 'Votre inscription au pack ' . $bundle->name . ' a été enregistrée avec succès !');
         }
@@ -467,8 +481,8 @@ class HomeController extends Controller
             ->exists();
             
         if ($exists) {
-            if ($request->has('redirect_to')) {
-                return redirect($request->input('redirect_to') . '?status=duplicate&course=' . urlencode($training->title));
+            if ($safeRedirectTo) {
+                return redirect($safeRedirectTo . '?status=duplicate&course=' . urlencode($training->title));
             }
             return redirect(url('/').'?status=duplicate&course=' . urlencode($training->title) . '#inscription');
         }
@@ -500,8 +514,20 @@ class HomeController extends Controller
             ], JSON_UNESCAPED_UNICODE),
         ]);
 
-        if ($request->has('redirect_to')) {
-            $redirectUrl = $request->input('redirect_to') . '?status=success&course=' . urlencode($request->course);
+        try {
+            \Illuminate\Support\Facades\Notification::send(
+                \App\Models\User::all(),
+                new \App\Notifications\AdminNotification(
+                    'Nouvelle inscription',
+                    $client->name . ' s\'est inscrit à ' . $training->title,
+                    route('admin.registrations'),
+                    'bi-person-plus'
+                )
+            );
+        } catch (\Exception $e) {}
+
+        if ($safeRedirectTo) {
+            $redirectUrl = $safeRedirectTo . '?status=success&course=' . urlencode($request->course);
             if ($discountApplied) {
                 $redirectUrl .= '&discount=true';
             }
@@ -530,6 +556,20 @@ class HomeController extends Controller
         $monthName = $months[$monthIndex] ?? $parsed->format('m');
 
         return $parsed->format('j') . ' ' . $monthName . ' ' . $parsed->format('Y');
+    }
+
+    private function getSafeRedirectUrl($url)
+    {
+        if (!$url) return null;
+        if (\Illuminate\Support\Str::startsWith($url, '/') && !\Illuminate\Support\Str::startsWith($url, '//')) {
+            return $url;
+        }
+        $parsed = parse_url($url);
+        $appHost = parse_url(config('app.url'), PHP_URL_HOST) ?? 'localhost';
+        if (isset($parsed['host']) && $parsed['host'] === $appHost) {
+            return $url;
+        }
+        return null;
     }
 
     private function buildTrainingGroups($categories, $trainings): array

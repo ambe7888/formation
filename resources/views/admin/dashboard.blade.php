@@ -136,4 +136,136 @@
     </div>
 </div>
 
+{{-- ─── Data Tables ──────────────────────────────────────── --}}
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:1.25rem;margin-top:1.25rem;">
+    {{-- Inscriptions récentes --}}
+    <div class="card p-0" style="overflow:hidden;">
+        <div class="p-4 border-bottom" style="display:flex;justify-content:space-between;align-items:center;">
+            <h5 class="mb-0">Inscriptions récentes</h5>
+            <a href="{{ route('admin.registrations') }}" class="btn btn-sm btn-outline-light">Voir tout</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th class="border-0 px-4 py-3">Client</th>
+                        <th class="border-0 px-4 py-3">Formation</th>
+                        <th class="border-0 px-4 py-3">Date</th>
+                        <th class="border-0 px-4 py-3 text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentRegistrations as $reg)
+                    @php
+                        $tTitle = $reg->training ? $reg->training->title : ($reg->bundle ? $reg->bundle->name : 'N/A');
+                        $tPrice = $reg->training ? ($reg->training->promo_price ?? $reg->training->price) : ($reg->bundle ? $reg->bundle->price : 0);
+                        $tPaid = $reg->payments->where('status', 'completed')->sum('amount');
+                        $tRemaining = max(0, $tPrice - $tPaid);
+                        $modalData = json_encode([
+                            'clientName' => $reg->client->name ?? 'N/A',
+                            'clientEmail' => $reg->client->email ?? 'N/A',
+                            'clientPhone' => $reg->client->phone ?? '',
+                            'trainingTitle' => $tTitle,
+                            'date' => $reg->created_at->format('d/m/Y'),
+                            'price' => number_format($tPrice, 0, ',', ' ') . ' FCFA',
+                            'paid' => number_format($tPaid, 0, ',', ' ') . ' FCFA',
+                            'remaining' => number_format($tRemaining, 0, ',', ' ') . ' FCFA',
+                            'remainingVal' => $tRemaining
+                        ]);
+                    @endphp
+                    <tr style="cursor: pointer;" onclick="document.getElementById('btn-modal-{{ $reg->id }}').click()">
+                        <td class="px-4 py-3 fw-bold">{{ $reg->client->name ?? 'Inconnu' }}</td>
+                        <td class="px-4 py-3 text-muted">{{ Str::limit($tTitle, 30) }}</td>
+                        <td class="px-4 py-3 text-muted">{{ $reg->created_at->format('d/m/Y') }}</td>
+                        <td class="px-4 py-3 text-end table-actions">
+                            <button type="button" id="btn-modal-{{ $reg->id }}" class="btn btn-sm btn-outline-light" title="Voir les détails" onclick="event.stopPropagation(); openRegistrationModal(JSON.parse(this.getAttribute('data-modal')))" data-modal="{{ $modalData }}">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="4" class="text-center p-4 text-muted">Aucune inscription.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {{-- Paiements récents --}}
+    <div class="card p-0" style="overflow:hidden;">
+        <div class="p-4 border-bottom" style="display:flex;justify-content:space-between;align-items:center;">
+            <h5 class="mb-0">Derniers paiements</h5>
+            <a href="{{ route('admin.payments') }}" class="btn btn-sm btn-outline-light">Voir tout</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th class="border-0 px-4 py-3">Client</th>
+                        <th class="border-0 px-4 py-3">Montant</th>
+                        <th class="border-0 px-4 py-3">Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentPayments as $pay)
+                    <tr>
+                        <td class="px-4 py-3 fw-bold">{{ $pay->registration->client->name ?? 'Inconnu' }}</td>
+                        <td class="px-4 py-3">{{ number_format($pay->amount, 0, ',', ' ') }} FCFA</td>
+                        <td class="px-4 py-3">
+                            @if($pay->status === 'completed')
+                                <span class="badge badge-success">Payé</span>
+                            @elseif($pay->status === 'pending')
+                                <span class="badge badge-warning">En attente</span>
+                            @else
+                                <span class="badge badge-danger">Échoué</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="3" class="text-center p-4 text-muted">Aucun paiement récent.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr;gap:1.25rem;margin-top:1.25rem;">
+    {{-- Paiements en attente --}}
+    <div class="card p-0" style="overflow:hidden;">
+        <div class="p-4 border-bottom" style="display:flex;justify-content:space-between;align-items:center;">
+            <h5 class="mb-0">Paiements en attente</h5>
+            <a href="{{ route('admin.payments') }}" class="btn btn-sm btn-outline-light">Voir tout</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th class="border-0 px-4 py-3">Date</th>
+                        <th class="border-0 px-4 py-3">Client</th>
+                        <th class="border-0 px-4 py-3">Montant</th>
+                        <th class="border-0 px-4 py-3">Méthode</th>
+                        <th class="border-0 px-4 py-3 text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($pendingPayments as $pay)
+                    <tr>
+                        <td class="px-4 py-3 text-muted">{{ $pay->created_at->format('d/m/Y H:i') }}</td>
+                        <td class="px-4 py-3 fw-bold">{{ $pay->registration->client->name ?? 'Inconnu' }}</td>
+                        <td class="px-4 py-3">{{ number_format($pay->amount, 0, ',', ' ') }} FCFA</td>
+                        <td class="px-4 py-3">{{ ucfirst($pay->method) }}</td>
+                        <td class="px-4 py-3 text-end table-actions">
+                            <a href="{{ route('admin.payments') }}" class="btn btn-sm btn-primary">Traiter</a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="5" class="text-center p-4 text-muted">Aucun paiement en attente.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 @endsection

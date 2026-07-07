@@ -30,7 +30,40 @@ class StudentDashboardController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        return view('student.dashboard', compact('client', 'registrations'));
+        $allTrainings = \App\Models\Training::where('is_active', true)->get();
+        $allBundles = \App\Models\Bundle::all();
+
+        $stats = [
+            'en_cours' => 0,
+            'a_venir' => 0,
+            'paiements_attente' => 0,
+            'paiements_retard' => 0,
+        ];
+
+        $now = now();
+        foreach ($registrations as $reg) {
+            $isStarted = false;
+            
+            if ($reg->training) {
+                if ($reg->training->start_date && $reg->training->start_date > $now) {
+                    $stats['a_venir']++;
+                } else {
+                    $stats['en_cours']++;
+                    $isStarted = true;
+                }
+            } elseif ($reg->bundle) {
+                $stats['en_cours']++;
+                $isStarted = true;
+            }
+
+            if ($isStarted && $reg->balance_due > 0) {
+                $stats['paiements_retard']++;
+            }
+
+            $stats['paiements_attente'] += $reg->payments->where('status', 'pending')->count();
+        }
+
+        return view('student.dashboard', compact('client', 'registrations', 'allTrainings', 'allBundles', 'stats'));
     }
 
     public function storePaymentDeclaration(Request $request)
@@ -46,7 +79,7 @@ class StudentDashboardController extends Controller
         $registration = Registration::where('client_id', $client->id)
             ->findOrFail($request->input('registration_id'));
 
-        Payment::create([
+        $payment = Payment::create([
             'registration_id' => $registration->id,
             'amount' => $request->input('amount'),
             'method' => $request->input('method'),
@@ -54,6 +87,19 @@ class StudentDashboardController extends Controller
             'reference' => $request->input('reference'),
             'paid_at' => null,
         ]);
+
+        try {
+            $courseName = $registration->training ? $registration->training->title : ($registration->bundle ? $registration->bundle->name : 'une formation');
+            \Illuminate\Support\Facades\Notification::send(
+                \App\Models\User::all(),
+                new \App\Notifications\AdminNotification(
+                    'Nouveau paiement',
+                    $client->name . ' a déclaré un versement de ' . number_format($payment->amount, 0, ',', ' ') . ' CFA pour ' . $courseName,
+                    route('admin.payments'),
+                    'bi-cash-coin'
+                )
+            );
+        } catch (\Exception $e) {}
 
         return redirect()->route('student.dashboard')->with('success', 'Votre versement de ' . number_format($request->amount, 0, ',', ' ') . ' CFA a été déclaré avec succès. Il apparaîtra sur votre tableau de bord dès sa validation par l\'administrateur.');
     }
@@ -82,5 +128,10 @@ class StudentDashboardController extends Controller
         ]);
 
         return redirect()->route('student.dashboard')->with('success', 'Votre inscription a été annulée avec succès.');
+    }
+    public function markNotificationsAsRead()
+    {
+        auth('client')->user()->unreadNotifications->markAsRead();
+        return back();
     }
 }
