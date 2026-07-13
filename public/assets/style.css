@@ -2054,7 +2054,6 @@ img {
         flex-wrap: nowrap !important;
         grid-template-columns: none !important;
         overflow-x: auto !important;
-        overflow-y: hidden !important;
         scroll-snap-type: x mandatory !important;
         -webkit-overflow-scrolling: touch !important;
         gap: 14px !important;
