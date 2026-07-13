@@ -467,6 +467,106 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* ─── Dashboard Tables ────────────────────────────── */
+        .dashboard-table-container {
+            background: var(--bg-surface);
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.02);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        .dashboard-table th {
+            background: rgba(30, 27, 24, 0.03);
+            padding: 1rem 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dashboard-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+            vertical-align: middle;
+        }
+
+        .dashboard-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .dashboard-table tr {
+            transition: background 0.2s ease;
+        }
+
+        .dashboard-table tr:hover {
+            background: rgba(30, 27, 24, 0.015);
+        }
+
+        .dashboard-table .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .dashboard-table .btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-main);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dashboard-table .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        /* ─── Modals ────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.2s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-container {
+            background: var(--bg-surface); border: 1px solid var(--border-color);
+            border-radius: 1rem; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;
+            transform: translateY(20px); transition: all 0.3s ease;
+            position: relative;
+        }
+        .modal-overlay.active .modal-container { transform: translateY(0); }
+        .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+        .modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; transition: color 0.2s; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; }
+        .modal-close:hover { background: var(--border-color); color: var(--text-dark); }
+        .modal-body { padding: 1.5rem; }
     </style>
 </head>
 <body style="margin: 0; padding: 0;">
@@ -619,228 +719,257 @@
                 </div>
             </div>
 
+            <!-- Suivi des inscriptions -->
+            <h3 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 2rem; margin-bottom: 1rem;">Suivi de mes Formations</h3>
+            <div class="dashboard-table-container">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Formation / Pack</th>
+                            <th>Tarif</th>
+                            <th>Payé</th>
+                            <th>Reste à payer</th>
+                            <th>Statut</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($registrations as $reg)
+                            @php
+                                $paid = $reg->amount_paid;
+                                $total = $reg->amount;
+                                $balance = $reg->balance_due;
+                                $percentage = $total > 0 ? min(100, round(($paid / $total) * 100)) : 0;
+                                $status = $reg->payment_status; // unpaid, partial, paid
+
+                                $resources = collect();
+                                if ($reg->training) {
+                                    $resources = $reg->training->resources;
+                                } elseif ($reg->bundle) {
+                                    foreach ($reg->bundle->trainings as $bt) {
+                                        $resources = $resources->concat($bt->resources);
+                                    }
+                                }
+                                $isConfirmed = $reg->status === 'confirmed';
+                            @endphp
+                            <tr>
+                                <td>
+                                    @if($reg->bundle_id)
+                                        <div style="font-weight: 700; color: var(--primary);">🎁 Pack : {{ optional($reg->bundle)->name ?? 'N/A' }}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-main); margin-top: 0.25rem;">
+                                            {{ optional($reg->bundle)->trainings->pluck('title')->implode(', ') }}
+                                        </div>
+                                    @else
+                                        <div style="font-weight: 700;">{{ optional($reg->training)->title ?? 'N/A' }}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                            📅 Début : {{ optional($reg->training)->start_date ? \Carbon\Carbon::parse($reg->training->start_date)->format('d F Y') : 'N/A' }}
+                                            | 📍 Lieu : {{ optional($reg->training)->location ?? 'Bingerville / En ligne' }}
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="fw-bold">{{ number_format($total, 0, ',', ' ') }} CFA</td>
+                                <td>
+                                    <div style="font-weight: 700;">{{ number_format($paid, 0, ',', ' ') }} CFA</div>
+                                    <div style="width: 100px; background: #e2e8f0; height: 6px; border-radius: 99px; margin-top: 0.35rem; overflow: hidden;">
+                                        <div style="width: {{ $percentage }}%; height: 100%; background: @if($status==='paid') var(--success) @elseif($status==='partial') var(--warning) @else var(--danger) @endif;"></div>
+                                    </div>
+                                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">{{ $percentage }}% versé</div>
+                                </td>
+                                <td class="fw-bold" style="color: @if($balance > 0) var(--danger) @else var(--success) @endif;">
+                                    {{ number_format($balance, 0, ',', ' ') }} CFA
+                                </td>
+                                <td>
+                                    <span class="badge" style="background-color: 
+                                        @if($status === 'paid') #d1fae5; color: #065f46;
+                                        @elseif($status === 'partial') #fef3c7; color: #92400e;
+                                        @else #fee2e2; color: #991b1b;
+                                        @endif
+                                    ">
+                                        @if($status === 'paid') Payé entièrement
+                                        @elseif($status === 'partial') Payé partiellement
+                                        @else Non payé
+                                        @endif
+                                    </span>
+                                </td>
+                                <td style="text-align: right; white-space: nowrap;">
+                                    <!-- Actions button group -->
+                                    <button type="button" class="btn-outline" 
+                                            onclick="openResourcesModal(this)"
+                                            data-title="{{ $reg->bundle ? $reg->bundle->name : $reg->training->title }}"
+                                            data-confirmed="{{ $isConfirmed ? '1' : '0' }}"
+                                            data-resources='@json($resources)'>
+                                        📁 Supports
+                                    </button>
+
+                                    <button type="button" class="btn-outline" 
+                                            onclick="openHistoryModal(this)"
+                                            data-title="{{ $reg->bundle ? $reg->bundle->name : $reg->training->title }}"
+                                            data-payments='@json($reg->payments)'>
+                                        🕒 Historique
+                                    </button>
+
+                                    @if($status !== 'paid')
+                                        <button type="button" class="btn-outline" 
+                                                style="border-color: var(--primary); color: var(--primary);"
+                                                onclick="openDeclareModal(this)"
+                                                data-id="{{ $reg->id }}"
+                                                data-title="{{ $reg->bundle ? $reg->bundle->name : $reg->training->title }}"
+                                                data-balance="{{ $balance }}">
+                                            💳 Payer
+                                        </button>
+                                    @endif
+
+                                    @if($reg->payments()->whereIn('status', ['completed', 'pending'])->count() === 0)
+                                        <form action="{{ route('student.registrations.destroy', $reg->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler et supprimer cette inscription ?')" style="display: inline-block; margin: 0;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-outline" style="color: var(--danger); border-color: rgba(220, 38, 38, 0.2);">
+                                                ❌ Annuler
+                                            </button>
+                                        </form>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem 1rem;">
+                                    Vous n'êtes inscrit à aucune formation pour le moment.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
         </div> <!-- End Overview Tab -->
 
         <!-- TAB 2: FORMATIONS -->
         <div id="formations" class="tab-content">
             <!-- Inscriptions listings -->
-        <h2 class="dashboard-section-title" id="formations">Mes Formations</h2>
+            <h2 class="dashboard-section-title">Mes Formations</h2>
 
-        @forelse($registrations as $reg)
-            @php
-                $paid = $reg->amount_paid;
-                $total = $reg->amount;
-                $balance = $reg->balance_due;
-                $percentage = $total > 0 ? min(100, round(($paid / $total) * 100)) : 0;
-                $status = $reg->payment_status; // unpaid, partial, paid
-            @endphp
+            <div class="dashboard-table-container">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Formation / Pack</th>
+                            <th>Tarif</th>
+                            <th>Payé</th>
+                            <th>Reste à payer</th>
+                            <th>Statut</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($registrations as $reg)
+                            @php
+                                $paid = $reg->amount_paid;
+                                $total = $reg->amount;
+                                $balance = $reg->balance_due;
+                                $percentage = $total > 0 ? min(100, round(($paid / $total) * 100)) : 0;
+                                $status = $reg->payment_status; // unpaid, partial, paid
 
-            <div class="registration-item" style="position: relative;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; margin-bottom: 1.5rem; gap: 1rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 1.25rem;">
-                    <!-- Training/Bundle General Parameters -->
-                    <div class="training-info">
-                        @if($reg->bundle_id)
-                            <h3 style="color: var(--primary); margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 800;">🎁 Pack : {{ optional($reg->bundle)->name ?? 'N/A' }}</h3>
-                            <div class="training-meta">
-                                <span style="background-color: var(--primary-soft); color: var(--primary-dark); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">📚 Inclus : {{ optional($reg->bundle)->trainings->pluck('title')->implode(', ') }}</span>
-                            </div>
-                        @else
-                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 800;">{{ optional($reg->training)->title ?? 'N/A' }}</h3>
-                            <div class="training-meta">
-                                <span>📅 Début : {{ optional($reg->training)->start_date ? \Carbon\Carbon::parse($reg->training->start_date)->format('d F Y') : 'N/A' }}</span>
-                                <span>📍 Lieu : {{ optional($reg->training)->location ?? 'Bingerville / En ligne' }}</span>
-                            </div>
-                        @endif
-                    </div>
-                    @if($reg->payments()->whereIn('status', ['completed', 'pending'])->count() === 0)
-                        <form action="{{ route('student.registrations.destroy', $reg->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler et supprimer cette inscription ?')" style="margin: 0;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="logout-btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; color: var(--danger); border-color: #fca5a5; font-weight: 700; background: #fff; cursor: pointer; border-radius: 0.5rem; transition: all 0.2s ease;">
-                                ❌ Annuler l'inscription
-                            </button>
-                        </form>
-                    @endif
-                </div>
-
-                <div class="registration-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); border-top: none; padding-top: 0; margin-top: 0;">
-                    <!-- Costs parameters -->
-                    <div class="financial-stat">
-                        <span class="stat-lbl">Tarif total</span>
-                        <span class="stat-val">{{ number_format($total, 0, ',', ' ') }} CFA</span>
-                    </div>
-
-                    <!-- Payment status badge & values -->
-                    <div class="financial-stat">
-                        <span class="stat-lbl">Statut du paiement</span>
-                        <div>
-                            <span class="badge" style="font-size: 0.8rem; padding: 0.35rem 0.65rem; background-color: 
-                                @if($status === 'paid') #d1fae5; color: #065f46;
-                                @elseif($status === 'partial') #fef3c7; color: #92400e;
-                                @else #fee2e2; color: #991b1b;
-                                @endif
-                            ">
-                                @if($status === 'paid') Payé entièrement
-                                @elseif($status === 'partial') Payé partiellement
-                                @else Non payé
-                                @endif
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Financial Progress indicator -->
-                <div class="progress-container">
-                    <div class="progress-bar-wrapper">
-                        <div class="progress-bar-fill" style="width: {{ $percentage }}%; background-color: 
-                            @if($status === 'paid') var(--success);
-                            @elseif($status === 'partial') var(--warning);
-                            @else var(--danger);
-                            @endif
-                        "></div>
-                    </div>
-                    <div class="progress-meta">
-                        <span>{{ $percentage }}% versé</span>
-                        <span>Payé : {{ number_format($paid, 0, ',', ' ') }} CFA | Reste : <strong>{{ number_format($balance, 0, ',', ' ') }} CFA</strong></span>
-                    </div>
-                </div>
-
-                <!-- Log of Recorded payments -->
-                @if($reg->payments->isNotEmpty())
-                    <div class="payments-log">
-                        <div class="log-title">Historique des transactions de versements</div>
-                        <table class="log-table">
-                            <thead>
-                                <tr>
-                                    <th>Montant</th>
-                                    <th>Méthode</th>
-                                    <th>Référence</th>
-                                    <th>Statut</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($reg->payments as $payment)
-                                    <tr>
-                                        <td><strong>{{ number_format($payment->amount, 0, ',', ' ') }} CFA</strong></td>
-                                        <td>{{ $payment->method }}</td>
-                                        <td><code>{{ $payment->reference ?? '-' }}</code></td>
-                                        <td>
-                                            <span class="badge" style="font-size: 0.75rem; padding: 0.15rem 0.4rem; background-color: 
-                                                @if($payment->status === 'completed') #d1fae5; color: #065f46;
-                                                @elseif($payment->status === 'failed') #fee2e2; color: #991b1b;
-                                                @else #fef3c7; color: #92400e;
-                                                @endif
-                                            ">
-                                                @if($payment->status === 'completed') validé
-                                                @elseif($payment->status === 'failed') échoué
-                                                @else en cours
-                                                @endif
-                                            </span>
-                                        </td>
-                                        <td>{{ $payment->created_at ? $payment->created_at->format('d/m/Y H:i') : '-' }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-
-                <!-- Learning Resources Section (For Confirmed Students) -->
-                @if($reg->status === 'confirmed')
-                    @php
-                        $resources = collect();
-                        if ($reg->training) {
-                            $resources = $reg->training->resources;
-                        } elseif ($reg->bundle) {
-                            foreach ($reg->bundle->trainings as $bt) {
-                                $resources = $resources->concat($bt->resources);
-                            }
-                        }
-                    @endphp
-                    <div class="payments-log" style="background-color: var(--primary-soft); border: 1px solid var(--border-color); margin-top: 1.5rem;">
-                        <div class="log-title" style="color: var(--primary); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                            <span>📁</span> Supports & Ressources de cours
-                        </div>
-                        @if($resources->isNotEmpty())
-                            <ul style="list-style: none; padding: 0; margin: 0;">
-                                @foreach($resources as $resource)
-                                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--bg-card); border-radius: 0.5rem; margin-bottom: 0.75rem; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02); border: 1px solid var(--border-color);">
-                                        <div>
-                                            <strong style="display: block; color: var(--text-dark); font-size: 0.9rem;">
-                                                @if($resource->type === 'file') 📄 @else 🔗 @endif {{ $resource->title }}
-                                            </strong>
-                                            @if($resource->description)
-                                                <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">{{ $resource->description }}</small>
-                                            @endif
+                                $resources = collect();
+                                if ($reg->training) {
+                                    $resources = $reg->training->resources;
+                                } elseif ($reg->bundle) {
+                                    foreach ($reg->bundle->trainings as $bt) {
+                                        $resources = $resources->concat($bt->resources);
+                                    }
+                                }
+                                $isConfirmed = $reg->status === 'confirmed';
+                            @endphp
+                            <tr>
+                                <td>
+                                    @if($reg->bundle_id)
+                                        <div style="font-weight: 700; color: var(--primary);">🎁 Pack : {{ optional($reg->bundle)->name ?? 'N/A' }}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-main); margin-top: 0.25rem;">
+                                            {{ optional($reg->bundle)->trainings->pluck('title')->implode(', ') }}
                                         </div>
-                                        <a href="{{ $resource->url }}" target="_blank" class="btn-declare" style="text-decoration: none; font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                                            @if($resource->type === 'file') Télécharger @else Accéder @endif
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <p class="text-muted small" style="margin: 0;">Aucune ressource n'a encore été ajoutée pour ce cours. Restez connecté(e) !</p>
-                        @endif
-                    </div>
-                @else
-                    <div class="payments-log" style="background-color: var(--bg-surface); border: 1px dashed var(--border-color); margin-top: 1.5rem;">
-                        <p class="text-muted small" style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-                             <span>🔒</span> Vos supports de cours (PDF, liens de visioconférence) seront débloqués automatiquement dès la validation de votre versement et la confirmation de votre inscription par l'administration.
-                        </p>
-                    </div>
-                @endif
+                                    @else
+                                        <div style="font-weight: 700;">{{ optional($reg->training)->title ?? 'N/A' }}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                            📅 Début : {{ optional($reg->training)->start_date ? \Carbon\Carbon::parse($reg->training->start_date)->format('d F Y') : 'N/A' }}
+                                            | 📍 Lieu : {{ optional($reg->training)->location ?? 'Bingerville / En ligne' }}
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="fw-bold">{{ number_format($total, 0, ',', ' ') }} CFA</td>
+                                <td>
+                                    <div style="font-weight: 700;">{{ number_format($paid, 0, ',', ' ') }} CFA</div>
+                                    <div style="width: 100px; background: #e2e8f0; height: 6px; border-radius: 99px; margin-top: 0.35rem; overflow: hidden;">
+                                        <div style="width: {{ $percentage }}%; height: 100%; background: @if($status==='paid') var(--success) @elseif($status==='partial') var(--warning) @else var(--danger) @endif;"></div>
+                                    </div>
+                                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">{{ $percentage }}% versé</div>
+                                </td>
+                                <td class="fw-bold" style="color: @if($balance > 0) var(--danger) @else var(--success) @endif;">
+                                    {{ number_format($balance, 0, ',', ' ') }} CFA
+                                </td>
+                                <td>
+                                    <span class="badge" style="background-color: 
+                                        @if($status === 'paid') #d1fae5; color: #065f46;
+                                        @elseif($status === 'partial') #fef3c7; color: #92400e;
+                                        @else #fee2e2; color: #991b1b;
+                                        @endif
+                                    ">
+                                        @if($status === 'paid') Payé entièrement
+                                        @elseif($status === 'partial') Payé partiellement
+                                        @else Non payé
+                                        @endif
+                                    </span>
+                                </td>
+                                <td style="text-align: right; white-space: nowrap;">
+                                    <!-- Actions button group -->
+                                    <button type="button" class="btn-outline" 
+                                            onclick="openResourcesModal(this)"
+                                            data-title="{{ $reg->bundle ? $reg->bundle->name : $reg->training->title }}"
+                                            data-confirmed="{{ $isConfirmed ? '1' : '0' }}"
+                                            data-resources='@json($resources)'>
+                                        📁 Supports
+                                    </button>
 
-                <!-- Payment Declaration form -->
-                @if($status !== 'paid')
-                    <div class="declaration-box">
-                        <button type="button" class="btn-declare" onclick="toggleForm({{ $reg->id }})">➕ Déclarer un versement partiel</button>
-                        
-                        <div class="declaration-form-wrapper" id="form-{{ $reg->id }}">
-                            <h4 class="form-title" style="margin-top: 0;">Déclarer un paiement par virement ou mobile money</h4>
-                            <p class="text-muted small" style="margin-top: -0.75rem; margin-bottom: 1.25rem;">Remplissez les détails après avoir effectué le versement. L'administrateur validera ensuite la transaction.</p>
-                            
-                            <form action="{{ route('student.payments.declare') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="registration_id" value="{{ $reg->id }}">
+                                    <button type="button" class="btn-outline" 
+                                            onclick="openHistoryModal(this)"
+                                            data-title="{{ $reg->bundle ? $reg->bundle->name : $reg->training->title }}"
+                                            data-payments='@json($reg->payments)'>
+                                        🕒 Historique
+                                    </button>
 
-                                <div class="form-row-grid">
-                                    <div>
-                                        <label class="lbl-custom" for="amount-{{ $reg->id }}">Montant versé (CFA) *</label>
-                                        <input type="number" id="amount-{{ $reg->id }}" name="amount" class="ctrl-custom" required max="{{ $balance }}" placeholder="ex: 15000">
+                                    @if($status !== 'paid')
+                                        <button type="button" class="btn-outline" 
+                                                style="border-color: var(--primary); color: var(--primary);"
+                                                onclick="openDeclareModal(this)"
+                                                data-id="{{ $reg->id }}"
+                                                data-title="{{ $reg->bundle ? $reg->bundle->name : $reg->training->title }}"
+                                                data-balance="{{ $balance }}">
+                                            💳 Payer
+                                        </button>
+                                    @endif
+
+                                    @if($reg->payments()->whereIn('status', ['completed', 'pending'])->count() === 0)
+                                        <form action="{{ route('student.registrations.destroy', $reg->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler et supprimer cette inscription ?')" style="display: inline-block; margin: 0;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-outline" style="color: var(--danger); border-color: rgba(220, 38, 38, 0.2);">
+                                                ❌ Annuler
+                                            </button>
+                                        </form>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem 1rem;">
+                                    Vous n'êtes inscrit à aucune formation pour le moment.
+                                    <div style="margin-top: 1.5rem;">
+                                        <a href="#" onclick="switchTab(event, 'catalogue')" class="btn-submit-payment" style="text-decoration: none; padding: 0.65rem 1.5rem;">Consulter notre catalogue</a>
                                     </div>
-                                    <div>
-                                        <label class="lbl-custom" for="method-{{ $reg->id }}">Méthode utilisée *</label>
-                                        <select id="method-{{ $reg->id }}" name="method" class="ctrl-custom" required>
-                                            <option value="Orange Money">Orange Money</option>
-                                            <option value="Wave">Wave</option>
-                                            <option value="MTN Mobile Money">MTN MoMo</option>
-                                            <option value="Moov Money">Moov Flooz</option>
-                                            <option value="Virement bancaire">Virement bancaire</option>
-                                            <option value="Espèces">Espèces</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="lbl-custom" for="reference-{{ $reg->id }}">N° de transaction / Référence</label>
-                                        <input type="text" id="reference-{{ $reg->id }}" name="reference" class="ctrl-custom" placeholder="ex: Ref: OM_89712">
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn-submit-payment">Soumettre la déclaration</button>
-                                <button type="button" class="btn-cancel" onclick="toggleForm({{ $reg->id }})">Annuler</button>
-                            </form>
-                        </div>
-                    </div>
-                @endif
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-        @empty
-            <div class="card card-borderless p-5 text-center text-muted">
-                <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">Vous n'êtes inscrit à aucune formation pour le moment.</p>
-                <div>
-                    <a href="{{ url('/') }}" class="btn btn-primary" style="text-decoration: none; padding: 0.75rem 1.5rem; font-weight: 700;">Consulter notre catalogue de formations</a>
-                </div>
-            </div>
-        @endforelse
         </div> <!-- End Formations Tab -->
 
         <!-- TAB 3: CATALOGUE -->
@@ -877,15 +1006,210 @@
             </div>
         </div> <!-- End Catalogue Tab -->
 
+        <!-- ── MODAL: DECLARE PAYMENT ── -->
+        <div class="modal-overlay" id="declarePaymentModal" onclick="closeDeclareModal(event)">
+            <div class="modal-container" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="declareModalTitle">Déclarer un versement</h3>
+                    <button class="modal-close" onclick="closeDeclareModal()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('student.payments.declare') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="registration_id" id="declare_registration_id">
+
+                        <div class="mb-3">
+                            <label class="lbl-custom" for="declare_amount">Montant versé (CFA) *</label>
+                            <input type="number" id="declare_amount" name="amount" class="ctrl-custom" required placeholder="ex: 15000">
+                            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;">Reste à payer maximum : <strong id="declare_max_balance">0</strong> CFA</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="lbl-custom" for="declare_method">Méthode utilisée *</label>
+                            <select id="declare_method" name="method" class="ctrl-custom" required>
+                                <option value="Orange Money">Orange Money</option>
+                                <option value="Wave">Wave</option>
+                                <option value="MTN Mobile Money">MTN MoMo</option>
+                                <option value="Moov Money">Moov Flooz</option>
+                                <option value="Virement bancaire">Virement bancaire</option>
+                                <option value="Espèces">Espèces</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="lbl-custom" for="declare_reference">N° de transaction / Référence</label>
+                            <input type="text" id="declare_reference" name="reference" class="ctrl-custom" placeholder="ex: Ref: OM_89712">
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4 pt-3 border-top" style="gap:0.5rem; display:flex; justify-content:flex-end;">
+                            <button type="button" class="logout-btn" onclick="closeDeclareModal()">Annuler</button>
+                            <button type="submit" class="btn-submit-payment">Soumettre la déclaration</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── MODAL: PAYMENT HISTORY ── -->
+        <div class="modal-overlay" id="paymentHistoryModal" onclick="closeHistoryModal(event)">
+            <div class="modal-container" style="max-width: 650px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="historyModalTitle">Historique des versements</h3>
+                    <button class="modal-close" onclick="closeHistoryModal()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div class="modal-body" id="historyModalBody">
+                    <!-- Table dynamically injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ── MODAL: COURSE RESOURCES ── -->
+        <div class="modal-overlay" id="courseResourcesModal" onclick="closeResourcesModal(event)">
+            <div class="modal-container" style="max-width: 650px;" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="resourcesModalTitle">Supports de cours</h3>
+                    <button class="modal-close" onclick="closeResourcesModal()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div class="modal-body" id="resourcesModalBody">
+                    <!-- Resources list dynamically injected via JS -->
+                </div>
+            </div>
+        </div>
+
     </main>
     </div> <!-- End student-main -->
 
     <script>
-        function toggleForm(id) {
-            const form = document.getElementById('form-' + id);
-            if (form) {
-                form.classList.toggle('active');
+        // Modal management
+        const declareModal = document.getElementById('declarePaymentModal');
+        const historyModal = document.getElementById('paymentHistoryModal');
+        const resourcesModal = document.getElementById('courseResourcesModal');
+
+        function openDeclareModal(btn) {
+            const id = btn.getAttribute('data-id');
+            const title = btn.getAttribute('data-title');
+            const balance = btn.getAttribute('data-balance');
+
+            document.getElementById('declareModalTitle').innerText = "Déclarer un versement — " + title;
+            document.getElementById('declare_registration_id').value = id;
+            document.getElementById('declare_amount').value = '';
+            document.getElementById('declare_amount').max = balance;
+            document.getElementById('declare_max_balance').innerText = Number(balance).toLocaleString('fr-FR');
+            document.getElementById('declare_reference').value = '';
+
+            declareModal.classList.add('active');
+        }
+
+        function closeDeclareModal(e) {
+            if (e && e.target !== declareModal && !e.target.closest('.modal-close') && !e.target.closest('.logout-btn')) return;
+            declareModal.classList.remove('active');
+        }
+
+        function openHistoryModal(btn) {
+            const title = btn.getAttribute('data-title');
+            const payments = JSON.parse(btn.getAttribute('data-payments') || '[]');
+
+            document.getElementById('historyModalTitle').innerText = "Historique des versements — " + title;
+
+            let html = '';
+            if (payments.length === 0) {
+                html = '<p class="text-muted text-center" style="padding: 2rem 0;">Aucune transaction enregistrée pour le moment.</p>';
+            } else {
+                html = `
+                    <table class="log-table" style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <th style="padding: 0.75rem 0.5rem; text-align: left; color:#64748b;">Montant</th>
+                                <th style="padding: 0.75rem 0.5rem; text-align: left; color:#64748b;">Méthode</th>
+                                <th style="padding: 0.75rem 0.5rem; text-align: left; color:#64748b;">Référence</th>
+                                <th style="padding: 0.75rem 0.5rem; text-align: left; color:#64748b;">Statut</th>
+                                <th style="padding: 0.75rem 0.5rem; text-align: left; color:#64748b;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                payments.forEach(p => {
+                    let statusBg = '#fef3c7', statusColor = '#92400e', statusText = 'en cours';
+                    if (p.status === 'completed') { statusBg = '#d1fae5'; statusColor = '#065f46'; statusText = 'validé'; }
+                    else if (p.status === 'failed') { statusBg = '#fee2e2'; statusColor = '#991b1b'; statusText = 'échoué'; }
+
+                    const dateStr = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR') : '-';
+
+                    html += `
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem 0.5rem;"><strong>${Number(p.amount).toLocaleString('fr-FR')} CFA</strong></td>
+                            <td style="padding: 0.75rem 0.5rem;">${p.method}</td>
+                            <td style="padding: 0.75rem 0.5rem;"><code>${p.reference || '-'}</code></td>
+                            <td style="padding: 0.75rem 0.5rem;">
+                                <span class="badge" style="background-color: ${statusBg}; color: ${statusColor}; font-size: 0.75rem; padding: 0.15rem 0.4rem;">
+                                    ${statusText}
+                                </span>
+                            </td>
+                            <td style="padding: 0.75rem 0.5rem;">${dateStr}</td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
             }
+
+            document.getElementById('historyModalBody').innerHTML = html;
+            historyModal.classList.add('active');
+        }
+
+        function closeHistoryModal(e) {
+            if (e && e.target !== historyModal && !e.target.closest('.modal-close')) return;
+            historyModal.classList.remove('active');
+        }
+
+        function openResourcesModal(btn) {
+            const title = btn.getAttribute('data-title');
+            const resources = JSON.parse(btn.getAttribute('data-resources') || '[]');
+            const confirmed = btn.getAttribute('data-confirmed') === '1';
+
+            document.getElementById('resourcesModalTitle').innerText = "Supports de cours — " + title;
+
+            let html = '';
+            if (!confirmed) {
+                html = `
+                    <div style="background-color: var(--bg-surface); border: 1px dashed var(--border-color); padding: 1.5rem; border-radius: 0.5rem; text-align: center;">
+                        <p style="color: var(--danger); font-size: 1.5rem; margin-bottom: 0.5rem;">🔒</p>
+                        <p class="text-muted small" style="margin: 0; line-height: 1.5;">
+                            Vos supports de cours (PDF, liens de visioconférence) seront débloqués automatiquement dès la validation de votre versement et la confirmation de votre inscription par l'administration.
+                        </p>
+                    </div>
+                `;
+            } else if (resources.length === 0) {
+                html = '<p class="text-muted text-center" style="padding: 2rem 0;">Aucune ressource n\'a encore été ajoutée pour ce cours. Restez connecté(e) !</p>';
+            } else {
+                html = '<ul style="list-style: none; padding: 0; margin: 0;">';
+                resources.forEach(r => {
+                    const icon = r.type === 'file' ? '📄' : '🔗';
+                    const actionText = r.type === 'file' ? 'Télécharger' : 'Accéder';
+                    html += `
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--bg-card); border-radius: 0.5rem; margin-bottom: 0.75rem; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02); border: 1px solid var(--border-color);">
+                            <div>
+                                <strong style="display: block; color: var(--text-dark); font-size: 0.9rem;">
+                                    ${icon} ${r.title}
+                                </strong>
+                                ${r.description ? `<small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">${r.description}</small>` : ''}
+                            </div>
+                            <a href="${r.url}" target="_blank" class="btn-declare" style="text-decoration: none; font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                ${actionText}
+                            </a>
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+            }
+
+            document.getElementById('resourcesModalBody').innerHTML = html;
+            resourcesModal.classList.add('active');
         }
 
         // Sidebar logic
