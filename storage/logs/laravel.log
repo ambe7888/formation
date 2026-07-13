@@ -7025,3 +7025,37 @@ Did you mean one of these?
 #19 C:/xampp/htdocs/formation/artisan(16): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
 #20 {main}
 "} 
+[2026-07-13 14:27:25] local.ERROR: SQLSTATE[HY000]: General error: 1364 Field 'id' doesn't have a default value (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: formation, SQL: insert into `training_resources` (`title`, `type`, `url`, `description`, `training_id`, `updated_at`, `created_at`) values (Support de cours PDF - Introduction, file, https://example.com/slide1.pdf, Les bases de PHP et la structure d'un projet web., 15, 2026-07-13 14:27:23, 2026-07-13 14:27:23)) {"exception":"[object] (Illuminate\\Database\\QueryException(code: HY000): SQLSTATE[HY000]: General error: 1364 Field 'id' doesn't have a default value (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: formation, SQL: insert into `training_resources` (`title`, `type`, `url`, `description`, `training_id`, `updated_at`, `created_at`) values (Support de cours PDF - Introduction, file, https://example.com/slide1.pdf, Les bases de PHP et la structure d'un projet web., 15, 2026-07-13 14:27:23, 2026-07-13 14:27:23)) at C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838)
+[stacktrace]
+#0 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate/Database/Connection->runQueryCallback('insert into `tr...', Array, Object(Closure))
+#1 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate/Database/Connection->run('insert into `tr...', Array, Object(Closure))
+#2 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate/Database/MySqlConnection->insert('insert into `tr...', Array, 'id')
+#3 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate/Database/Query/Processors/MySqlProcessor->processInsertGetId(Object(Illuminate/Database/Query/Builder), 'insert into `tr...', Array, 'id')
+#4 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate/Database/Query/Builder->insertGetId(Array, 'id')
+#5 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate/Database/Eloquent/Builder->__call('insertGetId', Array)
+#6 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate/Database/Eloquent/Model->insertAndSetId(Object(Illuminate/Database/Eloquent/Builder), Array)
+#7 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate/Database/Eloquent/Model->performInsert(Object(Illuminate/Database/Eloquent/Builder))
+#8 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/HasOneOrMany.php(391): Illuminate/Database/Eloquent/Model->save()
+#9 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate/Database/Eloquent/Relations/HasOneOrMany->Illuminate/Database/Eloquent/Relations/{closure}(Object(App/Models/TrainingResource))
+#10 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/HasOneOrMany.php(388): tap(Object(App/Models/TrainingResource), Object(Closure))
+#11 C:/xampp/htdocs/formation/check_db.php(57): Illuminate/Database/Eloquent/Relations/HasOneOrMany->create(Array)
+#12 {main}
+
+[previous exception] [object] (PDOException(code: HY000): SQLSTATE[HY000]: General error: 1364 Field 'id' doesn't have a default value at C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:53)
+[stacktrace]
+#0 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(53): PDOStatement->execute()
+#1 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Connection.php(827): Illuminate/Database/MySqlConnection->Illuminate/Database/{closure}('insert into `tr...', Array)
+#2 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Connection.php(794): Illuminate/Database/Connection->runQueryCallback('insert into `tr...', Array, Object(Closure))
+#3 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate/Database/Connection->run('insert into `tr...', Array, Object(Closure))
+#4 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate/Database/MySqlConnection->insert('insert into `tr...', Array, 'id')
+#5 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4170): Illuminate/Database/Query/Processors/MySqlProcessor->processInsertGetId(Object(Illuminate/Database/Query/Builder), 'insert into `tr...', Array, 'id')
+#6 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2237): Illuminate/Database/Query/Builder->insertGetId(Array, 'id')
+#7 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1436): Illuminate/Database/Eloquent/Builder->__call('insertGetId', Array)
+#8 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1401): Illuminate/Database/Eloquent/Model->insertAndSetId(Object(Illuminate/Database/Eloquent/Builder), Array)
+#9 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1240): Illuminate/Database/Eloquent/Model->performInsert(Object(Illuminate/Database/Eloquent/Builder))
+#10 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/HasOneOrMany.php(391): Illuminate/Database/Eloquent/Model->save()
+#11 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Support/helpers.php(393): Illuminate/Database/Eloquent/Relations/HasOneOrMany->Illuminate/Database/Eloquent/Relations/{closure}(Object(App/Models/TrainingResource))
+#12 C:/xampp/htdocs/formation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/HasOneOrMany.php(388): tap(Object(App/Models/TrainingResource), Object(Closure))
+#13 C:/xampp/htdocs/formation/check_db.php(57): Illuminate/Database/Eloquent/Relations/HasOneOrMany->create(Array)
+#14 {main}
+"} 
