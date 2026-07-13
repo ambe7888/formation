@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Modifier une formation'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -97,16 +95,24 @@
                                     <label class="small text-muted mb-1">Titre de la ressource</label>
                                     <input type="text" name="resource_title[]" value="<?php echo e($resource->title); ?>" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <label class="small text-muted mb-1">Type</label>
-                                    <select name="resource_type[]" class="form-select form-select-sm">
+                                    <select name="resource_type[]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
                                         <option value="link" <?php echo e($resource->type === 'link' ? 'selected' : ''); ?>>Lien externe</option>
-                                        <option value="file" <?php echo e($resource->type === 'file' ? 'selected' : ''); ?>>Fichier / PDF</option>
+                                        <option value="file" <?php echo e($resource->type === 'file' ? 'selected' : ''); ?>>Fichier / Document</option>
+                                        <option value="video" <?php echo e($resource->type === 'video' ? 'selected' : ''); ?>>Fichier Vidéo</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="small text-muted mb-1">Lien / URL</label>
-                                    <input type="text" name="resource_url[]" value="<?php echo e($resource->url); ?>" class="form-control form-control-sm" placeholder="ex: https://lien-telechargement.com/support.pdf">
+                                <div class="col-md-3">
+                                    <label class="small text-muted mb-1">Source</label>
+                                    <input type="text" name="resource_url[]" value="<?php echo e($resource->type === 'link' ? $resource->url : ''); ?>" class="form-control form-control-sm <?php echo e($resource->type !== 'link' ? 'd-none' : ''); ?>" placeholder="ex: https://...">
+                                    <input type="file" name="resource_file[]" class="form-control form-control-sm <?php echo e($resource->type === 'link' ? 'd-none' : ''); ?>">
+                                    <?php if($resource->type !== 'link'): ?>
+                                        <div class="small mt-1 text-truncate text-muted file-indicator">
+                                            Actuel: <a href="<?php echo e(Storage::url($resource->url)); ?>" target="_blank">Voir le fichier</a>
+                                        </div>
+                                    <?php endif; ?>
+                                    <input type="hidden" name="resource_old_file[]" value="<?php echo e($resource->type !== 'link' ? $resource->url : ''); ?>">
                                 </div>
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeResourceRow(this)">Supprimer</button>
@@ -118,16 +124,19 @@
                                     <label class="small text-muted mb-1">Titre de la ressource</label>
                                     <input type="text" name="resource_title[]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <label class="small text-muted mb-1">Type</label>
-                                    <select name="resource_type[]" class="form-select form-select-sm">
+                                    <select name="resource_type[]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
                                         <option value="link">Lien externe</option>
-                                        <option value="file">Fichier / PDF</option>
+                                        <option value="file">Fichier / Document</option>
+                                        <option value="video">Fichier Vidéo</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="small text-muted mb-1">Lien / URL</label>
-                                    <input type="text" name="resource_url[]" class="form-control form-control-sm" placeholder="ex: https://lien-telechargement.com/support.pdf">
+                                <div class="col-md-3">
+                                    <label class="small text-muted mb-1">Source</label>
+                                    <input type="text" name="resource_url[]" class="form-control form-control-sm" placeholder="ex: https://...">
+                                    <input type="file" name="resource_file[]" class="form-control form-control-sm d-none">
+                                    <input type="hidden" name="resource_old_file[]" value="">
                                 </div>
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeResourceRow(this)">Supprimer</button>
@@ -147,14 +156,17 @@
                             <div class="col-md-4">
                                 <input type="text" name="resource_title[]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
                             </div>
-                            <div class="col-md-2">
-                                <select name="resource_type[]" class="form-select form-select-sm">
+                            <div class="col-md-3">
+                                <select name="resource_type[]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
                                     <option value="link">Lien externe</option>
-                                    <option value="file">Fichier / PDF</option>
+                                    <option value="file">Fichier / Document</option>
+                                    <option value="video">Fichier Vidéo</option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
-                                <input type="text" name="resource_url[]" class="form-control form-control-sm" placeholder="ex: https://lien-telechargement.com/support.pdf">
+                            <div class="col-md-3">
+                                <input type="text" name="resource_url[]" class="form-control form-control-sm" placeholder="ex: https://...">
+                                <input type="file" name="resource_file[]" class="form-control form-control-sm d-none">
+                                <input type="hidden" name="resource_old_file[]" value="">
                             </div>
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeResourceRow(this)">Supprimer</button>
@@ -167,6 +179,28 @@
                         const row = button.closest('.resource-row');
                         if (row) {
                             row.remove();
+                        }
+                    }
+
+                    function toggleResourceInput(select) {
+                        const container = select.closest('.resource-row');
+                        const urlInput = container.querySelector('input[name="resource_url[]"]');
+                        const fileInput = container.querySelector('input[name="resource_file[]"]');
+                        const indicator = container.querySelector('.file-indicator');
+                        
+                        if (select.value === 'link') {
+                            urlInput.classList.remove('d-none');
+                            fileInput.classList.add('d-none');
+                            if (indicator) indicator.style.display = 'none';
+                        } else {
+                            urlInput.classList.add('d-none');
+                            fileInput.classList.remove('d-none');
+                            if (indicator) indicator.style.display = 'block';
+                            if (select.value === 'video') {
+                                fileInput.accept = 'video/mp4,video/x-m4v,video/*';
+                            } else {
+                                fileInput.accept = '.pdf,.doc,.docx,.zip,.rar,.txt';
+                            }
                         }
                     }
                 </script>

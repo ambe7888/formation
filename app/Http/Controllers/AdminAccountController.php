@@ -34,7 +34,7 @@ class AdminAccountController extends Controller
      */
     public function create()
     {
-        return view('admin.accounts.create');
+        return redirect()->route('admin.accounts.index')->with('open_create_modal', true);
     }
 
     /**
@@ -42,11 +42,18 @@ class AdminAccountController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('open_create_modal', true);
+        }
 
         User::create([
             'name' => $request->name,
@@ -63,7 +70,7 @@ class AdminAccountController extends Controller
      */
     public function edit(User $account)
     {
-        return view('admin.accounts.edit', compact('account'));
+        return redirect()->route('admin.accounts.index')->with('open_edit_modal', $account->id);
     }
 
     /**
@@ -71,11 +78,18 @@ class AdminAccountController extends Controller
      */
     public function update(Request $request, User $account)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($account->id)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('open_edit_modal', $account->id);
+        }
 
         $data = [
             'name' => $request->name,

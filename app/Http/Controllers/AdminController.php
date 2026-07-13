@@ -463,16 +463,23 @@ class AdminController extends Controller
 
     public function editSkill(Skill $skill)
     {
-        return view('admin.skills.edit', compact('skill'));
+        return redirect()->route('admin.skills')->with('open_edit_modal', $skill->id);
     }
 
     public function updateSkill(Request $request, Skill $skill)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:skills,name,' . $skill->id,
             'slug' => 'nullable|string|max:255|unique:skills,slug,' . $skill->id,
             'badge_color' => 'required|string|max:7',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('open_edit_modal', $skill->id);
+        }
 
         $data = $request->only(['name', 'slug', 'badge_color']);
         if (empty($data['slug'])) {
