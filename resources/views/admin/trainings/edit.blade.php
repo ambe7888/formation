@@ -92,14 +92,15 @@
                     <label class="form-label d-block mb-2"><strong>Supports de cours & Ressources d'apprentissage (débloqués après paiement)</strong></label>
                     <div id="resources-container" class="p-3 border rounded" style="background: #f8fafc;">
                         @forelse($training->resources as $resource)
-                            <div class="resource-row row g-2 mb-2 align-items-end">
+                            @php $index = $loop->index; @endphp
+                            <div class="resource-row row g-2 mb-2 align-items-end" data-index="{{ $index }}">
                                 <div class="col-md-4">
                                     <label class="small text-muted mb-1">Titre de la ressource</label>
-                                    <input type="text" name="resource_title[]" value="{{ $resource->title }}" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
+                                    <input type="text" name="resource_title[{{ $index }}]" value="{{ $resource->title }}" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
                                 </div>
                                 <div class="col-md-3">
                                     <label class="small text-muted mb-1">Type</label>
-                                    <select name="resource_type[]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
+                                    <select name="resource_type[{{ $index }}]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
                                         <option value="link" {{ $resource->type === 'link' ? 'selected' : '' }}>Lien externe</option>
                                         <option value="file" {{ $resource->type === 'file' ? 'selected' : '' }}>Fichier / Document</option>
                                         <option value="video" {{ $resource->type === 'video' ? 'selected' : '' }}>Fichier Vidéo</option>
@@ -107,28 +108,32 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="small text-muted mb-1">Source</label>
-                                    <input type="text" name="resource_url[]" value="{{ $resource->type === 'link' ? $resource->url : '' }}" class="form-control form-control-sm {{ $resource->type !== 'link' ? 'd-none' : '' }}" placeholder="ex: https://...">
-                                    <input type="file" name="resource_file[]" class="form-control form-control-sm {{ $resource->type === 'link' ? 'd-none' : '' }}">
+                                    <input type="text" name="resource_url[{{ $index }}]" value="{{ $resource->type === 'link' ? $resource->url : '' }}" class="form-control form-control-sm {{ $resource->type !== 'link' ? 'd-none' : '' }}" placeholder="ex: https://...">
+                                    <input type="file" name="resource_file[{{ $index }}]" class="form-control form-control-sm {{ $resource->type === 'link' ? 'd-none' : '' }}">
                                     @if($resource->type !== 'link')
                                         <div class="small mt-1 text-truncate text-muted file-indicator">
-                                            Actuel: <a href="{{ Storage::url($resource->url) }}" target="_blank">Voir le fichier</a>
+                                            @if($resource->type === 'video')
+                                                🎥 Actuel: <a href="{{ Storage::url($resource->url) }}" target="_blank">Voir la vidéo</a>
+                                            @else
+                                                📄 Actuel: <a href="{{ Storage::url($resource->url) }}" target="_blank">Voir le fichier</a>
+                                            @endif
                                         </div>
                                     @endif
-                                    <input type="hidden" name="resource_old_file[]" value="{{ $resource->type !== 'link' ? $resource->url : '' }}">
+                                    <input type="hidden" name="resource_old_file[{{ $index }}]" value="{{ $resource->type !== 'link' ? $resource->url : '' }}">
                                 </div>
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeResourceRow(this)">Supprimer</button>
                                 </div>
                             </div>
                         @empty
-                            <div class="resource-row row g-2 mb-2 align-items-end">
+                            <div class="resource-row row g-2 mb-2 align-items-end" data-index="0">
                                 <div class="col-md-4">
                                     <label class="small text-muted mb-1">Titre de la ressource</label>
-                                    <input type="text" name="resource_title[]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
+                                    <input type="text" name="resource_title[0]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
                                 </div>
                                 <div class="col-md-3">
                                     <label class="small text-muted mb-1">Type</label>
-                                    <select name="resource_type[]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
+                                    <select name="resource_type[0]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
                                         <option value="link">Lien externe</option>
                                         <option value="file">Fichier / Document</option>
                                         <option value="video">Fichier Vidéo</option>
@@ -136,9 +141,9 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="small text-muted mb-1">Source</label>
-                                    <input type="text" name="resource_url[]" class="form-control form-control-sm" placeholder="ex: https://...">
-                                    <input type="file" name="resource_file[]" class="form-control form-control-sm d-none">
-                                    <input type="hidden" name="resource_old_file[]" value="">
+                                    <input type="text" name="resource_url[0]" class="form-control form-control-sm" placeholder="ex: https://...">
+                                    <input type="file" name="resource_file[0]" class="form-control form-control-sm d-none">
+                                    <input type="hidden" name="resource_old_file[0]" value="">
                                 </div>
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeResourceRow(this)">Supprimer</button>
@@ -150,31 +155,34 @@
                 </div>
 
                 <script>
+                    let resourceIndex = {{ $training->resources->count() > 0 ? $training->resources->count() : 1 }};
+
                     function addResourceRow() {
                         const container = document.getElementById('resources-container');
                         const row = document.createElement('div');
                         row.className = 'resource-row row g-2 mb-2 align-items-end';
                         row.innerHTML = `
                             <div class="col-md-4">
-                                <input type="text" name="resource_title[]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
+                                <input type="text" name="resource_title[${resourceIndex}]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
                             </div>
                             <div class="col-md-3">
-                                <select name="resource_type[]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
+                                <select name="resource_type[${resourceIndex}]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
                                     <option value="link">Lien externe</option>
                                     <option value="file">Fichier / Document</option>
                                     <option value="video">Fichier Vidéo</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <input type="text" name="resource_url[]" class="form-control form-control-sm" placeholder="ex: https://...">
-                                <input type="file" name="resource_file[]" class="form-control form-control-sm d-none">
-                                <input type="hidden" name="resource_old_file[]" value="">
+                                <input type="text" name="resource_url[${resourceIndex}]" class="form-control form-control-sm" placeholder="ex: https://...">
+                                <input type="file" name="resource_file[${resourceIndex}]" class="form-control form-control-sm d-none">
+                                <input type="hidden" name="resource_old_file[${resourceIndex}]" value="">
                             </div>
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeResourceRow(this)">Supprimer</button>
                             </div>
                         `;
                         container.appendChild(row);
+                        resourceIndex++;
                     }
 
                     function removeResourceRow(button) {
@@ -186,8 +194,8 @@
 
                     function toggleResourceInput(select) {
                         const container = select.closest('.resource-row');
-                        const urlInput = container.querySelector('input[name="resource_url[]"]');
-                        const fileInput = container.querySelector('input[name="resource_file[]"]');
+                        const urlInput = container.querySelector('input[name^="resource_url"]');
+                        const fileInput = container.querySelector('input[name^="resource_file"]');
                         const indicator = container.querySelector('.file-indicator');
                         
                         if (select.value === 'link') {

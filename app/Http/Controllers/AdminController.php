@@ -80,6 +80,8 @@ class AdminController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'skills' => 'nullable|array',
             'skills.*' => 'exists:skills,id',
+            'resource_file' => 'nullable|array',
+            'resource_file.*' => 'nullable|file|max:102400', // 100 Mo max
         ]);
 
         $category = Category::find($request->input('category_id'));
@@ -151,6 +153,8 @@ class AdminController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'skills' => 'nullable|array',
             'skills.*' => 'exists:skills,id',
+            'resource_file' => 'nullable|array',
+            'resource_file.*' => 'nullable|file|max:102400', // 100 Mo max
         ]);
 
         $category = Category::find($request->input('category_id'));
