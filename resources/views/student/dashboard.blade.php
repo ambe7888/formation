@@ -1224,6 +1224,11 @@
             resourcesModal.classList.add('active');
         }
 
+        function closeResourcesModal(e) {
+            if (e && e.target !== resourcesModal && !e.target.closest('.modal-close')) return;
+            resourcesModal.classList.remove('active');
+        }
+
         // Sidebar logic
         function toggleSidebar() {
             const sidebar = document.getElementById('studentSidebar');
