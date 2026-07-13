@@ -17,6 +17,11 @@ class Client extends Authenticatable
         'email',
         'phone',
         'password',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     protected $hidden = [

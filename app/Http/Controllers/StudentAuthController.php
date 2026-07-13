@@ -64,6 +64,14 @@ class StudentAuthController extends Controller
         $remember = $request->has('remember');
 
         if (auth('client')->attempt($credentials, $remember)) {
+            $client = auth('client')->user();
+            if (!$client->is_active) {
+                auth('client')->logout();
+                return back()->withErrors([
+                    'email' => 'Votre compte a été désactivé. Veuillez contacter l\'administration.',
+                ])->onlyInput('email');
+            }
+
             \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
             $request->session()->regenerate();
             return redirect()->route('student.dashboard');

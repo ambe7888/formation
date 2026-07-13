@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminAccountController;
+use App\Http\Controllers\AdminStudentController;
 use App\Http\Controllers\HomeController;
 
 Route::get('/', [HomeController::class, 'index']);
@@ -25,6 +26,9 @@ Route::prefix('admin')->group(function () {
 
     // Admin Accounts
     Route::resource('accounts', AdminAccountController::class)->except(['show'])->names('admin.accounts');
+    
+    // Student Accounts
+    Route::resource('students', AdminStudentController::class)->except(['show'])->names('admin.students');
     
 
     Route::get('/categories', [AdminController::class, 'categories'])->name('admin.categories');

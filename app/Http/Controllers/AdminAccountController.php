@@ -9,6 +9,17 @@ use Illuminate\Validation\Rule;
 
 class AdminAccountController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!auth()->check()) {
+                return redirect()->route('admin.login');
+            }
+
+            return $next($request);
+        });
+    }
+
     /**
      * Affiche la liste des comptes administrateurs.
      */

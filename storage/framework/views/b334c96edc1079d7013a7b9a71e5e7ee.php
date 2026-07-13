@@ -16,6 +16,7 @@
                         <th>Référence</th>
                         <th>Statut</th>
                         <th>Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,6 +65,30 @@
                             <td style="font-size:0.78rem;color:var(--text-3);">
                                 <?php echo e($payment->paid_at ? $payment->paid_at->format('d/m/Y H:i') : '-'); ?>
 
+                            </td>
+                            <td>
+                                <?php if($payment->status === 'pending'): ?>
+                                    <div style="display: flex; gap: 0.25rem;">
+                                        <form action="<?php echo e(route('admin.payments.status', $payment->id)); ?>" method="POST" style="margin:0;">
+                                            <?php echo csrf_field(); ?>
+                                            <?php echo method_field('PATCH'); ?>
+                                            <input type="hidden" name="status" value="completed">
+                                            <button type="submit" class="btn btn-sm btn-success" title="Approuver" style="padding: 0.2rem 0.4rem;">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                            </button>
+                                        </form>
+                                        <form action="<?php echo e(route('admin.payments.status', $payment->id)); ?>" method="POST" style="margin:0;">
+                                            <?php echo csrf_field(); ?>
+                                            <?php echo method_field('PATCH'); ?>
+                                            <input type="hidden" name="status" value="failed">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Rejeter" style="padding: 0.2rem 0.4rem;">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
