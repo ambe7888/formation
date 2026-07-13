@@ -1189,8 +1189,20 @@
             } else {
                 html = '<ul style="list-style: none; padding: 0; margin: 0;">';
                 resources.forEach(r => {
-                    const icon = r.type === 'file' ? '📄' : '🔗';
-                    const actionText = r.type === 'file' ? 'Télécharger' : 'Accéder';
+                    let icon = '🔗';
+                    let actionText = 'Accéder';
+                    let fileUrl = r.url;
+
+                    if (r.type === 'file') {
+                        icon = '📄';
+                        actionText = 'Télécharger';
+                        fileUrl = '{{ asset("storage") }}/' + r.url;
+                    } else if (r.type === 'video') {
+                        icon = '🎥';
+                        actionText = 'Regarder';
+                        fileUrl = '{{ asset("storage") }}/' + r.url;
+                    }
+
                     html += `
                         <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--bg-card); border-radius: 0.5rem; margin-bottom: 0.75rem; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02); border: 1px solid var(--border-color);">
                             <div>
@@ -1199,7 +1211,7 @@
                                 </strong>
                                 ${r.description ? `<small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">${r.description}</small>` : ''}
                             </div>
-                            <a href="${r.url}" target="_blank" class="btn-declare" style="text-decoration: none; font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                            <a href="${fileUrl}" target="_blank" class="btn-declare" style="text-decoration: none; font-size: 0.8rem; padding: 0.4rem 0.8rem;">
                                 ${actionText}
                             </a>
                         </li>
