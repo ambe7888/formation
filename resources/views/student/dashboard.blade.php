@@ -157,6 +157,26 @@
             margin-bottom: 3rem;
         }
 
+        @media (max-width: 768px) {
+            .mobile-scroll-row {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                scroll-snap-type: x mandatory;
+                padding-bottom: 1rem;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            .mobile-scroll-row::-webkit-scrollbar {
+                display: none;
+            }
+            .mobile-scroll-row > * {
+                flex: 0 0 85% !important;
+                scroll-snap-align: center;
+            }
+        }
+
         .summary-card {
             background: var(--bg-card);
             border-radius: 1.25rem;
@@ -559,7 +579,7 @@
         <div id="overview" class="tab-content active">
             <!-- Educational/Progress tiles -->
             <h3 style="font-size: 1.1rem; color: var(--text-dark); margin-bottom: 1rem;">Mon Parcours</h3>
-            <div class="summary-grid" style="margin-bottom: 2rem;">
+            <div class="summary-grid mobile-scroll-row" style="margin-bottom: 2rem;">
                 <div class="summary-card">
                     <div class="summary-label">Formations en cours</div>
                     <div class="summary-value">{{ $stats['en_cours'] }}</div>
@@ -580,7 +600,7 @@
 
             <!-- Financial tiles -->
             <h3 style="font-size: 1.1rem; color: var(--text-dark); margin-bottom: 1rem;">Ma Facturation</h3>
-            <div class="summary-grid">
+            <div class="summary-grid mobile-scroll-row">
                 <div class="summary-card">
                     <div class="summary-label">Formations Inscrites</div>
                     <div class="summary-value">{{ $totalInscriptions }}</div>
@@ -827,7 +847,7 @@
         <div id="catalogue" class="tab-content">
             <h2 class="dashboard-section-title">Catalogue des Formations</h2>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="mobile-scroll-row" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                 @foreach($allTrainings as $training)
                     <div class="summary-card" style="padding: 1.25rem; border-left: 4px solid var(--primary); display: flex; flex-direction: column; gap: 1rem;">
                         <div>

@@ -2057,7 +2057,6 @@ img {
         overflow-y: hidden !important;
         scroll-snap-type: x mandatory !important;
         -webkit-overflow-scrolling: touch !important;
-        touch-action: pan-x !important;
         gap: 14px !important;
         padding: 4px 16px 16px !important;
         margin-left: -16px !important;
