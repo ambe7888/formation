@@ -59,7 +59,8 @@ class AdminController extends Controller
     {
         $categories = Category::orderBy('sort_order')->get();
         $skills = Skill::orderBy('name')->get();
-        return view('admin.trainings.create', compact('categories', 'skills'));
+        $media = \App\Models\Media::latest()->get();
+        return view('admin.trainings.create', compact('categories', 'skills', 'media'));
     }
 
     public function storeTraining(Request $request)
@@ -80,18 +81,17 @@ class AdminController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'skills' => 'nullable|array',
             'skills.*' => 'exists:skills,id',
-            'resource_file' => 'nullable|array',
-            'resource_file.*' => 'nullable|file|max:102400', // 100 Mo max
         ]);
 
         $resourceTitles = $request->input('resource_title', []);
         $resourceTypes = $request->input('resource_type', []);
+        $resourceUrls = $request->input('resource_url', []);
         
         foreach ($resourceTitles as $i => $title) {
             $type = $resourceTypes[$i] ?? 'link';
             if (in_array($type, ['file', 'video'])) {
-                if (!$request->hasFile("resource_file.$i") && empty($request->input("resource_old_file.$i"))) {
-                    return back()->withErrors(['resource_file.'.$i => "Le fichier pour la ressource '".$title."' est manquant ou trop volumineux (limite serveur PHP : " . ini_get('upload_max_filesize') . ")."])->withInput();
+                if (empty($resourceUrls[$i])) {
+                    return back()->withErrors(['resource_url.'.$i => "Le fichier pour la ressource '".$title."' n'a pas été sélectionné dans la médiathèque."])->withInput();
                 }
             }
         }
@@ -121,12 +121,6 @@ class AdminController extends Controller
             $type = $resourceTypes[$i] ?? 'link';
             $url = $resourceUrls[$i] ?? '';
             
-            if (in_array($type, ['file', 'video']) && $request->hasFile("resource_file.$i")) {
-                $url = $request->file("resource_file.$i")->store('resources', 'public');
-            } elseif (in_array($type, ['file', 'video']) && !empty($request->input("resource_old_file.$i"))) {
-                $url = $request->input("resource_old_file.$i");
-            }
-
             if (!empty($title) && !empty($url)) {
                 $training->resources()->create([
                     'title' => $title,
@@ -144,7 +138,8 @@ class AdminController extends Controller
     {
         $categories = Category::orderBy('sort_order')->get();
         $skills = Skill::orderBy('name')->get();
-        return view('admin.trainings.edit', compact('training', 'categories', 'skills'));
+        $media = \App\Models\Media::latest()->get();
+        return view('admin.trainings.edit', compact('training', 'categories', 'skills', 'media'));
     }
 
     public function updateTraining(Request $request, Training $training)
@@ -165,18 +160,17 @@ class AdminController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'skills' => 'nullable|array',
             'skills.*' => 'exists:skills,id',
-            'resource_file' => 'nullable|array',
-            'resource_file.*' => 'nullable|file|max:102400', // 100 Mo max
         ]);
 
         $resourceTitles = $request->input('resource_title', []);
         $resourceTypes = $request->input('resource_type', []);
+        $resourceUrls = $request->input('resource_url', []);
         
         foreach ($resourceTitles as $i => $title) {
             $type = $resourceTypes[$i] ?? 'link';
             if (in_array($type, ['file', 'video'])) {
-                if (!$request->hasFile("resource_file.$i") && empty($request->input("resource_old_file.$i"))) {
-                    return back()->withErrors(['resource_file.'.$i => "Le fichier pour la ressource '".$title."' est manquant ou trop volumineux (limite serveur PHP : " . ini_get('upload_max_filesize') . ")."])->withInput();
+                if (empty($resourceUrls[$i])) {
+                    return back()->withErrors(['resource_url.'.$i => "Le fichier pour la ressource '".$title."' n'a pas été sélectionné dans la médiathèque."])->withInput();
                 }
             }
         }
@@ -207,12 +201,6 @@ class AdminController extends Controller
             $type = $resourceTypes[$i] ?? 'link';
             $url = $resourceUrls[$i] ?? '';
             
-            if (in_array($type, ['file', 'video']) && $request->hasFile("resource_file.$i")) {
-                $url = $request->file("resource_file.$i")->store('resources', 'public');
-            } elseif (in_array($type, ['file', 'video']) && !empty($request->input("resource_old_file.$i"))) {
-                $url = $request->input("resource_old_file.$i");
-            }
-
             if (!empty($title) && !empty($url)) {
                 $training->resources()->create([
                     'title' => $title,

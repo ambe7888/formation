@@ -617,6 +617,14 @@
                     <span class="link-text">Offres Packs</span>
                 </a>
 
+                <a href="{{ route('admin.media.index') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.media*') ? 'active' : '' }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span class="link-text">Médiathèque</span>
+                </a>
+
                 <div class="sidebar-section-label" style="margin-top:0.5rem;">Clients</div>
 
                 <a href="{{ route('admin.registrations') }}"

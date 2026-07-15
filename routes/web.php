@@ -30,6 +30,10 @@ Route::prefix('admin')->group(function () {
     // Student Accounts
     Route::resource('students', AdminStudentController::class)->except(['show'])->names('admin.students');
     
+    // Media Library
+    Route::get('/media', [\App\Http\Controllers\Admin\MediaController::class, 'index'])->name('admin.media.index');
+    Route::post('/media', [\App\Http\Controllers\Admin\MediaController::class, 'store'])->name('admin.media.store');
+    Route::delete('/media/{media}', [\App\Http\Controllers\Admin\MediaController::class, 'destroy'])->name('admin.media.destroy');
 
     Route::get('/categories', [AdminController::class, 'categories'])->name('admin.categories');
     Route::get('/categories/create', [AdminController::class, 'createCategory'])->name('admin.categories.create');

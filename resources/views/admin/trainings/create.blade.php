@@ -101,8 +101,8 @@
                 
                 <!-- Dynamic Resources Section -->
                 <div class="col-12 mt-4">
-                    <label class="form-label d-block mb-2"><strong>Supports de cours & Ressources d'apprentissage (débloqués après paiement)</strong></label>
-                    <div id="resources-container" class="p-3 border rounded" style="background: #f8fafc;">
+                    <h5 class="mb-3">Ressources (fichiers, vidéos, liens)</h5>
+                    <div id="resources-container">
                         <div class="resource-row row g-2 mb-2 align-items-end">
                             <div class="col-md-4">
                                 <label class="small text-muted mb-1">Titre de la ressource</label>
@@ -110,7 +110,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="small text-muted mb-1">Type</label>
-                                <select name="resource_type[0]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
+                                <select name="resource_type[0]" class="form-select form-select-sm" onchange="toggleResourceInput(this, 0)">
                                     <option value="link">Lien externe</option>
                                     <option value="file">Fichier / Document</option>
                                     <option value="video">Fichier Vidéo</option>
@@ -118,8 +118,8 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="small text-muted mb-1">Source</label>
-                                <input type="text" name="resource_url[0]" class="form-control form-control-sm" placeholder="ex: https://...">
-                                <input type="file" name="resource_file[0]" class="form-control form-control-sm d-none">
+                                <input type="text" id="resource_url_0" name="resource_url[0]" class="form-control form-control-sm" placeholder="ex: https://...">
+                                <button type="button" id="resource_btn_0" class="btn btn-sm btn-outline-primary w-100 d-none" onclick="openMediaModal(0)">Sélectionner dans la Médiathèque</button>
                             </div>
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeResourceRow(this)">Supprimer</button>
@@ -131,6 +131,7 @@
 
                 <script>
                     let resourceIndex = 1;
+                    let currentResourceTarget = null;
 
                     function addResourceRow() {
                         const container = document.getElementById('resources-container');
@@ -141,15 +142,15 @@
                                 <input type="text" name="resource_title[${resourceIndex}]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
                             </div>
                             <div class="col-md-3">
-                                <select name="resource_type[${resourceIndex}]" class="form-select form-select-sm" onchange="toggleResourceInput(this)">
+                                <select name="resource_type[${resourceIndex}]" class="form-select form-select-sm" onchange="toggleResourceInput(this, ${resourceIndex})">
                                     <option value="link">Lien externe</option>
                                     <option value="file">Fichier / Document</option>
                                     <option value="video">Fichier Vidéo</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <input type="text" name="resource_url[${resourceIndex}]" class="form-control form-control-sm" placeholder="ex: https://...">
-                                <input type="file" name="resource_file[${resourceIndex}]" class="form-control form-control-sm d-none">
+                                <input type="text" id="resource_url_${resourceIndex}" name="resource_url[${resourceIndex}]" class="form-control form-control-sm" placeholder="ex: https://...">
+                                <button type="button" id="resource_btn_${resourceIndex}" class="btn btn-sm btn-outline-primary w-100 d-none" onclick="openMediaModal(${resourceIndex})">Sélectionner dans la Médiathèque</button>
                             </div>
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeResourceRow(this)">Supprimer</button>
@@ -166,22 +167,34 @@
                         }
                     }
 
-                    function toggleResourceInput(select) {
-                        const container = select.closest('.resource-row');
-                        const urlInput = container.querySelector('input[name^="resource_url"]');
-                        const fileInput = container.querySelector('input[name^="resource_file"]');
+                    function toggleResourceInput(select, index) {
+                        const urlInput = document.getElementById('resource_url_' + index);
+                        const mediaBtn = document.getElementById('resource_btn_' + index);
                         
                         if (select.value === 'link') {
                             urlInput.classList.remove('d-none');
-                            fileInput.classList.add('d-none');
+                            urlInput.placeholder = "ex: https://...";
+                            urlInput.readOnly = false;
+                            mediaBtn.classList.add('d-none');
                         } else {
-                            urlInput.classList.add('d-none');
-                            fileInput.classList.remove('d-none');
-                            if (select.value === 'video') {
-                                fileInput.accept = 'video/mp4,video/x-m4v,video/*';
-                            } else {
-                                fileInput.accept = '.pdf,.doc,.docx,.zip,.rar,.txt';
-                            }
+                            urlInput.classList.remove('d-none');
+                            urlInput.placeholder = "Sélectionné depuis la médiathèque...";
+                            urlInput.readOnly = true;
+                            mediaBtn.classList.remove('d-none');
+                        }
+                    }
+
+                    function openMediaModal(index) {
+                        currentResourceTarget = index;
+                        const modal = new bootstrap.Modal(document.getElementById('mediaLibraryModal'));
+                        modal.show();
+                    }
+
+                    function selectMedia(filePath) {
+                        if (currentResourceTarget !== null) {
+                            const urlInput = document.getElementById('resource_url_' + currentResourceTarget);
+                            urlInput.value = filePath;
+                            bootstrap.Modal.getInstance(document.getElementById('mediaLibraryModal')).hide();
                         }
                     }
                 </script>
@@ -209,4 +222,47 @@
             </div>
         </form>
     </div>
+
+<!-- Media Library Modal -->
+<div class="modal fade" id="mediaLibraryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: var(--bg-card); border: 1px solid var(--border);">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title" style="color: var(--text-1);">Choisir depuis la médiathèque</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: var(--close-filter);"></button>
+            </div>
+            <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+                @if(isset($media) && $media->isNotEmpty())
+                    <div class="row g-3">
+                        @foreach($media as $item)
+                            <div class="col-md-4">
+                                <div class="card card-borderless text-center p-3 h-100 cursor-pointer" onclick="selectMedia('{{ $item->file_path }}')" style="cursor: pointer;">
+                                    <div class="mb-2">
+                                        @if($item->type == 'image')
+                                            <span class="badge bg-primary bg-opacity-10 text-primary mb-2">Image</span>
+                                        @elseif($item->type == 'video')
+                                            <span class="badge bg-danger bg-opacity-10 text-danger mb-2">Vidéo</span>
+                                        @else
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary mb-2">Document</span>
+                                        @endif
+                                    </div>
+                                    <div class="fw-semibold small text-truncate" title="{{ $item->name }}">{{ $item->name }}</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">{{ number_format($item->size / 1048576, 2) }} Mo</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-4 text-muted">
+                        <p>La médiathèque est vide.</p>
+                        <a href="{{ route('admin.media.index') }}" target="_blank" class="btn btn-sm btn-primary mt-2">Aller à la médiathèque</a>
+                    </div>
+                @endif
+            </div>
+            <div class="modal-footer border-top">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
