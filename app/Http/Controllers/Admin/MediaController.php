@@ -34,13 +34,27 @@ class MediaController extends Controller
 
         $path = $file->store('media', 'public');
 
-        Media::create([
+        $mediaItem = Media::create([
             'name' => $file->getClientOriginalName(),
             'file_path' => $path,
             'type' => $type,
             'mime_type' => $file->getClientMimeType(),
             'size' => $file->getSize(),
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'media' => [
+                    'id' => $mediaItem->id,
+                    'name' => $mediaItem->name,
+                    'file_path' => $mediaItem->file_path,
+                    'file_url' => Storage::url($mediaItem->file_path),
+                    'type' => $mediaItem->type,
+                    'size_formatted' => number_format($mediaItem->size / 1048576, 2) . ' Mo',
+                ]
+            ]);
+        }
 
         return redirect()->route('admin.media.index')->with('success', 'Fichier ajouté avec succès à la médiathèque.');
     }

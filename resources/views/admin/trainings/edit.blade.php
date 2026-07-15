@@ -231,8 +231,13 @@
 
                     function openMediaModal(index) {
                         currentResourceTarget = index;
-                        const modal = new bootstrap.Modal(document.getElementById('mediaLibraryModal'));
-                        modal.show();
+                        document.getElementById('mediaLibraryModal').classList.add('active');
+                    }
+
+                    function closeMediaPickerModal(e) {
+                        if (!e || e.target === document.getElementById('mediaLibraryModal') || e.target.classList.contains('modal-close') || e.target.closest('.btn-secondary')) {
+                            document.getElementById('mediaLibraryModal').classList.remove('active');
+                        }
                     }
 
                     function selectMedia(filePath) {
@@ -240,15 +245,27 @@
                             const urlInput = document.getElementById('resource_url_' + currentResourceTarget);
                             if (urlInput) {
                                 urlInput.value = filePath;
-                                // clear old indicator text visually for feedback
                                 const container = urlInput.closest('.resource-row');
                                 const indicator = container.querySelector('.file-indicator');
                                 if (indicator) {
-                                    indicator.innerHTML = '<span class="text-success">Fichier mis à jour depuis la médiathèque !</span>';
+                                    indicator.innerHTML = '<span class="text-success fw-semibold">Fichier sélectionné depuis la médiathèque !</span>';
                                 }
                             }
-                            bootstrap.Modal.getInstance(document.getElementById('mediaLibraryModal')).hide();
+                            document.getElementById('mediaLibraryModal').classList.remove('active');
                         }
+                    }
+
+                    function filterPickerMedia() {
+                        const q = document.getElementById('pickerSearchInput').value.toLowerCase();
+                        const items = document.querySelectorAll('.picker-media-item');
+                        items.forEach(item => {
+                            const name = item.getAttribute('data-name');
+                            if (name.includes(q)) {
+                                item.style.display = '';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
                     }
                 </script>
 
@@ -276,47 +293,46 @@
             </div>
         </form>
     </div>
-    </div>
 
-<!-- Media Library Modal -->
-<div class="modal fade" id="mediaLibraryModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" style="background: var(--bg-card); border: 1px solid var(--border);">
-            <div class="modal-header border-bottom">
-                <h5 class="modal-title" style="color: var(--text-1);">Choisir depuis la médiathèque</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: var(--close-filter);"></button>
+<!-- Media Library Modal (Native Overlay) -->
+<div id="mediaLibraryModal" class="modal-overlay" onclick="closeMediaPickerModal(event)">
+    <div class="modal-container" style="max-width: 720px;" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h5 class="modal-title">Sélectionner un fichier de la médiathèque</h5>
+            <button type="button" class="modal-close" onclick="closeMediaPickerModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+                <input type="text" id="pickerSearchInput" class="form-control" placeholder="Rechercher un fichier par nom..." onkeyup="filterPickerMedia()" style="max-width: 320px;">
+                <a href="{{ route('admin.media.index') }}" target="_blank" class="btn btn-sm btn-outline-primary">+ Uploader dans la médiathèque</a>
             </div>
-            <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
-                @if(isset($media) && $media->isNotEmpty())
-                    <div class="row g-3">
-                        @foreach($media as $item)
-                            <div class="col-md-4">
-                                <div class="card card-borderless text-center p-3 h-100 cursor-pointer" onclick="selectMedia('{{ $item->file_path }}')" style="cursor: pointer;">
-                                    <div class="mb-2">
-                                        @if($item->type == 'image')
-                                            <span class="badge bg-primary bg-opacity-10 text-primary mb-2">Image</span>
-                                        @elseif($item->type == 'video')
-                                            <span class="badge bg-danger bg-opacity-10 text-danger mb-2">Vidéo</span>
-                                        @else
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary mb-2">Document</span>
-                                        @endif
-                                    </div>
-                                    <div class="fw-semibold small text-truncate" title="{{ $item->name }}">{{ $item->name }}</div>
-                                    <div class="text-muted" style="font-size: 0.7rem;">{{ number_format($item->size / 1048576, 2) }} Mo</div>
+
+            @if(isset($media) && $media->isNotEmpty())
+                <div class="row g-2" style="max-height: 50vh; overflow-y: auto;">
+                    @foreach($media as $item)
+                        <div class="col-md-4 picker-media-item" data-name="{{ strtolower($item->name) }}">
+                            <div class="p-3 border rounded text-center h-100 cursor-pointer media-picker-card" onclick="selectMedia('{{ $item->file_path }}')" style="background: var(--bg-surface); cursor: pointer; transition: all 0.2s;">
+                                <div class="mb-1">
+                                    @if($item->type == 'image')
+                                        <span class="badge badge-primary">Image</span>
+                                    @elseif($item->type == 'video')
+                                        <span class="badge badge-danger">Vidéo</span>
+                                    @else
+                                        <span class="badge badge-muted">Document</span>
+                                    @endif
                                 </div>
+                                <div class="fw-semibold small text-truncate" title="{{ $item->name }}" style="color: var(--text-1);">{{ $item->name }}</div>
+                                <div class="text-muted" style="font-size: 0.7rem;">{{ number_format($item->size / 1048576, 2) }} Mo</div>
                             </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-4 text-muted">
-                        <p>La médiathèque est vide.</p>
-                        <a href="{{ route('admin.media.index') }}" target="_blank" class="btn btn-sm btn-primary mt-2">Aller à la médiathèque</a>
-                    </div>
-                @endif
-            </div>
-            <div class="modal-footer border-top">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-4 text-muted">
+                    <p class="mb-2">La médiathèque est vide.</p>
+                    <a href="{{ route('admin.media.index') }}" target="_blank" class="btn btn-sm btn-primary">Ajouter un fichier à la médiathèque</a>
+                </div>
+            @endif
         </div>
     </div>
 </div>

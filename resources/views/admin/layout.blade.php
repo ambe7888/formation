@@ -560,6 +560,7 @@
             *, .admin-page-content { animation: none !important; transition: none !important; }
         }
     </style>
+    @stack('styles')
 </head>
 <body>
     <div class="admin-shell">
@@ -902,5 +903,6 @@
             });
         }
     </script>
+    @stack('scripts')
 </body>
 </html>
