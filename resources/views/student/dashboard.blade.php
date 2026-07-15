@@ -1196,11 +1196,11 @@
                     if (r.type === 'file') {
                         icon = '📄';
                         actionText = 'Télécharger';
-                        fileUrl = '{{ asset("storage") }}/' + r.url;
+                        fileUrl = r.url.startsWith('http') ? r.url : '{{ asset("storage") }}/' + r.url;
                     } else if (r.type === 'video') {
                         icon = '🎥';
                         actionText = 'Regarder';
-                        fileUrl = '{{ asset("storage") }}/' + r.url;
+                        fileUrl = r.url.startsWith('http') ? r.url : '{{ asset("storage") }}/' + r.url;
                     }
 
                     html += `

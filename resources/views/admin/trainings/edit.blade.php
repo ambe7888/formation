@@ -112,10 +112,13 @@
                                     <input type="file" name="resource_file[{{ $index }}]" class="form-control form-control-sm {{ $resource->type === 'link' ? 'd-none' : '' }}">
                                     @if($resource->type !== 'link')
                                         <div class="small mt-1 text-truncate text-muted file-indicator">
+                                            @php
+                                                $fileUrl = str_starts_with($resource->url, 'http') ? $resource->url : Storage::url($resource->url);
+                                            @endphp
                                             @if($resource->type === 'video')
-                                                🎥 Actuel: <a href="{{ Storage::url($resource->url) }}" target="_blank">Voir la vidéo</a>
+                                                🎥 Actuel: <a href="{{ $fileUrl }}" target="_blank">Voir la vidéo</a>
                                             @else
-                                                📄 Actuel: <a href="{{ Storage::url($resource->url) }}" target="_blank">Voir le fichier</a>
+                                                📄 Actuel: <a href="{{ $fileUrl }}" target="_blank">Voir le fichier</a>
                                             @endif
                                         </div>
                                     @endif
