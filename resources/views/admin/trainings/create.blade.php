@@ -9,6 +9,18 @@
                 Aucune catégorie n'est définie. <a href="{{ route('admin.categories.create') }}">Ajoutez une catégorie</a> avant de créer une formation.
             </div>
         @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <strong>Oups! Il y a des erreurs dans votre formulaire :</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('admin.trainings.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row g-3">

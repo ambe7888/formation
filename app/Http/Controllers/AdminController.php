@@ -84,6 +84,18 @@ class AdminController extends Controller
             'resource_file.*' => 'nullable|file|max:102400', // 100 Mo max
         ]);
 
+        $resourceTitles = $request->input('resource_title', []);
+        $resourceTypes = $request->input('resource_type', []);
+        
+        foreach ($resourceTitles as $i => $title) {
+            $type = $resourceTypes[$i] ?? 'link';
+            if (in_array($type, ['file', 'video'])) {
+                if (!$request->hasFile("resource_file.$i") && empty($request->input("resource_old_file.$i"))) {
+                    return back()->withErrors(['resource_file.'.$i => "Le fichier pour la ressource '".$title."' est manquant ou trop volumineux (limite serveur PHP : " . ini_get('upload_max_filesize') . ")."])->withInput();
+                }
+            }
+        }
+
         $category = Category::find($request->input('category_id'));
 
         $data = $request->only(['title', 'description', 'start_date', 'planned_month', 'location', 'price', 'promo_price', 'seats', 'hero_order']);
@@ -156,6 +168,18 @@ class AdminController extends Controller
             'resource_file' => 'nullable|array',
             'resource_file.*' => 'nullable|file|max:102400', // 100 Mo max
         ]);
+
+        $resourceTitles = $request->input('resource_title', []);
+        $resourceTypes = $request->input('resource_type', []);
+        
+        foreach ($resourceTitles as $i => $title) {
+            $type = $resourceTypes[$i] ?? 'link';
+            if (in_array($type, ['file', 'video'])) {
+                if (!$request->hasFile("resource_file.$i") && empty($request->input("resource_old_file.$i"))) {
+                    return back()->withErrors(['resource_file.'.$i => "Le fichier pour la ressource '".$title."' est manquant ou trop volumineux (limite serveur PHP : " . ini_get('upload_max_filesize') . ")."])->withInput();
+                }
+            }
+        }
 
         $category = Category::find($request->input('category_id'));
 

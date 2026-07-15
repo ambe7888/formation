@@ -4,6 +4,17 @@
 
 @section('content')
     <div class="card card-borderless p-4">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <strong>Oups! Il y a des erreurs dans votre formulaire :</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        
         <form action="{{ route('admin.trainings.update', $training) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
