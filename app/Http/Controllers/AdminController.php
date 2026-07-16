@@ -51,7 +51,7 @@ class AdminController extends Controller
 
     public function trainings()
     {
-        $trainings = Training::with('category')->orderByDesc('created_at')->get();
+        $trainings = Training::with(['category', 'skills', 'resources'])->orderByDesc('created_at')->get();
         return view('admin.trainings.index', compact('trainings'));
     }
 
