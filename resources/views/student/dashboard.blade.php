@@ -744,10 +744,18 @@
 
                                 $resources = collect();
                                 if ($reg->training) {
-                                    $resources = $reg->training->resources;
+                                    foreach ($reg->training->resources as $res) {
+                                        $arr = $res->toArray();
+                                        $arr['training_title'] = $reg->training->title;
+                                        $resources->push($arr);
+                                    }
                                 } elseif ($reg->bundle) {
                                     foreach ($reg->bundle->trainings as $bt) {
-                                        $resources = $resources->concat($bt->resources);
+                                        foreach ($bt->resources as $res) {
+                                            $arr = $res->toArray();
+                                            $arr['training_title'] = $bt->title;
+                                            $resources->push($arr);
+                                        }
                                     }
                                 }
                                 $isConfirmed = $reg->status === 'confirmed';
@@ -871,10 +879,18 @@
 
                                 $resources = collect();
                                 if ($reg->training) {
-                                    $resources = $reg->training->resources;
+                                    foreach ($reg->training->resources as $res) {
+                                        $arr = $res->toArray();
+                                        $arr['training_title'] = $reg->training->title;
+                                        $resources->push($arr);
+                                    }
                                 } elseif ($reg->bundle) {
                                     foreach ($reg->bundle->trainings as $bt) {
-                                        $resources = $resources->concat($bt->resources);
+                                        foreach ($bt->resources as $res) {
+                                            $arr = $res->toArray();
+                                            $arr['training_title'] = $bt->title;
+                                            $resources->push($arr);
+                                        }
                                     }
                                 }
                                 $isConfirmed = $reg->status === 'confirmed';
@@ -1187,37 +1203,56 @@
             } else if (resources.length === 0) {
                 html = '<p class="text-muted text-center" style="padding: 2rem 0;">Aucune ressource n\'a encore été ajoutée pour ce cours. Restez connecté(e) !</p>';
             } else {
-                html = '<ul style="list-style: none; padding: 0; margin: 0;">';
+                // Group resources by training title
+                const grouped = {};
                 resources.forEach(r => {
-                    let icon = '🔗';
-                    let actionText = 'Accéder';
-                    let fileUrl = r.url;
-
-                    if (r.type === 'file') {
-                        icon = '📄';
-                        actionText = 'Télécharger';
-                        fileUrl = r.url.startsWith('http') ? r.url : '{{ asset("storage") }}/' + r.url;
-                    } else if (r.type === 'video') {
-                        icon = '🎥';
-                        actionText = 'Regarder';
-                        fileUrl = r.url.startsWith('http') ? r.url : '{{ asset("storage") }}/' + r.url;
+                    const groupKey = r.training_title || title;
+                    if (!grouped[groupKey]) {
+                        grouped[groupKey] = [];
                     }
-
-                    html += `
-                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--bg-card); border-radius: 0.5rem; margin-bottom: 0.75rem; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02); border: 1px solid var(--border-color);">
-                            <div>
-                                <strong style="display: block; color: var(--text-dark); font-size: 0.9rem;">
-                                    ${icon} ${r.title}
-                                </strong>
-                                ${r.description ? `<small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">${r.description}</small>` : ''}
-                            </div>
-                            <a href="${fileUrl}" target="_blank" class="btn-declare" style="text-decoration: none; font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                                ${actionText}
-                            </a>
-                        </li>
-                    `;
+                    grouped[groupKey].push(r);
                 });
-                html += '</ul>';
+
+                Object.keys(grouped).forEach(tName => {
+                    html += `
+                        <div style="font-weight: 700; color: var(--primary); font-size: 0.92rem; margin-top: 1rem; margin-bottom: 0.6rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
+                            <span>🎓</span> <span>${tName}</span>
+                        </div>
+                        <ul style="list-style: none; padding: 0; margin: 0 0 1rem 0;">
+                    `;
+
+                    grouped[tName].forEach(r => {
+                        let icon = '🔗';
+                        let actionText = 'Accéder';
+                        let fileUrl = r.url;
+
+                        if (r.type === 'file') {
+                            icon = '📄';
+                            actionText = 'Télécharger';
+                            fileUrl = r.url.startsWith('http') ? r.url : '{{ asset("storage") }}/' + r.url;
+                        } else if (r.type === 'video') {
+                            icon = '🎥';
+                            actionText = 'Regarder';
+                            fileUrl = r.url.startsWith('http') ? r.url : '{{ asset("storage") }}/' + r.url;
+                        }
+
+                        html += `
+                            <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--bg-card); border-radius: 0.5rem; margin-bottom: 0.5rem; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02); border: 1px solid var(--border-color);">
+                                <div>
+                                    <strong style="display: block; color: var(--text-dark); font-size: 0.9rem;">
+                                        ${icon} ${r.title}
+                                    </strong>
+                                    ${r.description ? `<small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">${r.description}</small>` : ''}
+                                </div>
+                                <a href="${fileUrl}" target="_blank" class="btn-declare" style="text-decoration: none; font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                    ${actionText}
+                                </a>
+                            </li>
+                        `;
+                    });
+
+                    html += '</ul>';
+                });
             }
 
             document.getElementById('resourcesModalBody').innerHTML = html;
