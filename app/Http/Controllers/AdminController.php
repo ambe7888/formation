@@ -59,7 +59,11 @@ class AdminController extends Controller
     {
         $categories = Category::orderBy('sort_order')->get();
         $skills = Skill::orderBy('name')->get();
-        $media = \App\Models\Media::latest()->get();
+        try {
+            $media = \App\Models\Media::latest()->get();
+        } catch (\Throwable $e) {
+            $media = collect();
+        }
         return view('admin.trainings.create', compact('categories', 'skills', 'media'));
     }
 
@@ -138,7 +142,11 @@ class AdminController extends Controller
     {
         $categories = Category::orderBy('sort_order')->get();
         $skills = Skill::orderBy('name')->get();
-        $media = \App\Models\Media::latest()->get();
+        try {
+            $media = \App\Models\Media::latest()->get();
+        } catch (\Throwable $e) {
+            $media = collect();
+        }
         return view('admin.trainings.edit', compact('training', 'categories', 'skills', 'media'));
     }
 
