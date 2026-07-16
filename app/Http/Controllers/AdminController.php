@@ -93,8 +93,13 @@ class AdminController extends Controller
         
         foreach ($resourceTitles as $i => $title) {
             $type = $resourceTypes[$i] ?? 'link';
-            if (in_array($type, ['file', 'video'])) {
-                if (empty($resourceUrls[$i])) {
+            $url = $resourceUrls[$i] ?? '';
+            
+            if (!empty($url) || !empty(trim($title))) {
+                if (empty(trim($title))) {
+                    return back()->withErrors(['resource_title.'.$i => "Le titre de la ressource #".($i + 1)." est obligatoire."])->withInput();
+                }
+                if (in_array($type, ['file', 'video']) && empty($url)) {
                     return back()->withErrors(['resource_url.'.$i => "Le fichier pour la ressource '".$title."' n'a pas été sélectionné dans la médiathèque."])->withInput();
                 }
             }
@@ -176,8 +181,13 @@ class AdminController extends Controller
         
         foreach ($resourceTitles as $i => $title) {
             $type = $resourceTypes[$i] ?? 'link';
-            if (in_array($type, ['file', 'video'])) {
-                if (empty($resourceUrls[$i])) {
+            $url = $resourceUrls[$i] ?? '';
+            
+            if (!empty($url) || !empty(trim($title))) {
+                if (empty(trim($title))) {
+                    return back()->withErrors(['resource_title.'.$i => "Le titre de la ressource #".($i + 1)." est obligatoire."])->withInput();
+                }
+                if (in_array($type, ['file', 'video']) && empty($url)) {
                     return back()->withErrors(['resource_url.'.$i => "Le fichier pour la ressource '".$title."' n'a pas été sélectionné dans la médiathèque."])->withInput();
                 }
             }

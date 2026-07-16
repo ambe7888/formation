@@ -105,8 +105,8 @@
                     <div id="resources-container">
                         <div class="resource-row row g-2 mb-2 align-items-end">
                             <div class="col-md-4">
-                                <label class="small text-muted mb-1">Titre de la ressource</label>
-                                <input type="text" name="resource_title[0]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
+                                <label class="small text-muted mb-1">Titre de la ressource <span class="text-danger">*</span></label>
+                                <input type="text" name="resource_title[0]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1" required>
                             </div>
                             <div class="col-md-3">
                                 <label class="small text-muted mb-1">Type</label>
@@ -139,7 +139,7 @@
                         row.className = 'resource-row row g-2 mb-2 align-items-end';
                         row.innerHTML = `
                             <div class="col-md-4">
-                                <input type="text" name="resource_title[${resourceIndex}]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1">
+                                <input type="text" name="resource_title[${resourceIndex}]" class="form-control form-control-sm" placeholder="ex: Manuel PDF Module 1" required>
                             </div>
                             <div class="col-md-3">
                                 <select name="resource_type[${resourceIndex}]" class="form-select form-select-sm" onchange="toggleResourceInput(this, ${resourceIndex})">
