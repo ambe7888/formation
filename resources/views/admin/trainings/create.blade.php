@@ -241,46 +241,191 @@
         </form>
     </div>
 
-<!-- Media Library Modal (Native Overlay) -->
+<!-- Media Library Modal — New Design -->
 <div id="mediaLibraryModal" class="modal-overlay" onclick="closeMediaPickerModal(event)">
-    <div class="modal-container" style="max-width: 720px;" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <h5 class="modal-title">Sélectionner un fichier de la médiathèque</h5>
-            <button type="button" class="modal-close" onclick="closeMediaPickerModal()">&times;</button>
+    <div onclick="event.stopPropagation()" style="
+        background: var(--bg-card);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 780px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+    ">
+        <!-- Header -->
+        <div style="padding: 18px 24px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+            <svg width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            <span style="font-weight: 700; font-size: 1rem; color: var(--text-1);">Médiathèque</span>
+            <span id="pickerFileCount" style="font-size: 0.8rem; background: var(--primary); color: #fff; padding: 1px 8px; border-radius: 20px; font-weight: 600;">{{ isset($media) ? $media->count() : 0 }}</span>
+            <button onclick="closeMediaPickerModal()" style="margin-left: auto; background: none; border: none; font-size: 1.4rem; color: var(--text-2); cursor: pointer; line-height: 1;">&times;</button>
         </div>
-        <div class="modal-body">
-            <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
-                <input type="text" id="pickerSearchInput" class="form-control" placeholder="Rechercher un fichier par nom..." onkeyup="filterPickerMedia()" style="max-width: 320px;">
-                <a href="{{ route('admin.media.index') }}" target="_blank" class="btn btn-sm btn-outline-primary">+ Uploader dans la médiathèque</a>
-            </div>
 
+        <!-- Toolbar: Search + Upload -->
+        <div style="padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+            <div style="position: relative; flex: 1;">
+                <svg width="15" height="15" fill="none" stroke="var(--text-3)" stroke-width="2" viewBox="0 0 24 24" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="pickerSearchInput" placeholder="Rechercher des fichiers..." onkeyup="filterPickerMedia()" style="width: 100%; padding: 8px 10px 8px 34px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-surface); color: var(--text-1); font-size: 0.875rem; outline: none;">
+            </div>
+            <button onclick="document.getElementById('pickerFileUploadInput').click()" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Téléverser
+            </button>
+            <input type="file" id="pickerFileUploadInput" class="d-none" onchange="uploadFromPicker(this)">
+        </div>
+
+        <!-- Upload Progress Bar (hidden by default) -->
+        <div id="pickerUploadProgress" style="display:none; padding: 8px 24px; background: var(--bg-surface); border-bottom: 1px solid var(--border); align-items: center; gap: 12px;">
+            <div style="flex: 1; height: 6px; background: var(--border); border-radius: 10px; overflow: hidden;">
+                <div id="pickerProgressBar" style="height: 100%; width: 0%; background: var(--primary); border-radius: 10px; transition: width 0.1s;"></div>
+            </div>
+            <span id="pickerProgressText" style="font-size: 0.78rem; color: var(--text-2); min-width: 36px; text-align: right;">0%</span>
+        </div>
+
+        <!-- File Count Info -->
+        <div id="pickerFileInfo" style="padding: 6px 24px; font-size: 0.78rem; color: var(--text-3); border-bottom: 1px solid var(--border);">
+            {{ isset($media) ? $media->count() : 0 }} fichier(s) · Page 1 de 1
+        </div>
+
+        <!-- Grid Body -->
+        <div id="pickerGridBody" style="padding: 16px 24px; overflow-y: auto; flex: 1;">
             @if(isset($media) && $media->isNotEmpty())
-                <div class="row g-2" style="max-height: 50vh; overflow-y: auto;">
+                <div class="row g-2" id="pickerGrid">
                     @foreach($media as $item)
-                        <div class="col-md-4 picker-media-item" data-name="{{ strtolower($item->name) }}">
-                            <div class="p-3 border rounded text-center h-100 cursor-pointer media-picker-card" onclick="selectMedia('{{ $item->file_path }}')" style="background: var(--bg-surface); cursor: pointer; transition: all 0.2s;">
-                                <div class="mb-1">
-                                    @if($item->type == 'image')
-                                        <span class="badge badge-primary">Image</span>
-                                    @elseif($item->type == 'video')
-                                        <span class="badge badge-danger">Vidéo</span>
-                                    @else
-                                        <span class="badge badge-muted">Document</span>
-                                    @endif
-                                </div>
-                                <div class="fw-semibold small text-truncate" title="{{ $item->name }}" style="color: var(--text-1);">{{ $item->name }}</div>
-                                <div class="text-muted" style="font-size: 0.7rem;">{{ number_format($item->size / 1048576, 2) }} Mo</div>
+                        <div class="col-6 col-md-3 picker-media-item" data-name="{{ strtolower($item->name) }}">
+                            <div onclick="selectMedia('{{ $item->file_path }}', '{{ addslashes($item->name) }}')"
+                                style="border: 2px solid var(--border); border-radius: 10px; padding: 14px 10px; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; background: var(--bg-surface);"
+                                class="picker-card">
+                                @if($item->type == 'image')
+                                    <div style="font-size: 2rem; margin-bottom: 6px;">🖼️</div>
+                                    <span style="font-size: 0.65rem; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 20px; font-weight: 600;">Image</span>
+                                @elseif($item->type == 'video')
+                                    <div style="font-size: 2rem; margin-bottom: 6px;">🎥</div>
+                                    <span style="font-size: 0.65rem; background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 20px; font-weight: 600;">Vidéo</span>
+                                @else
+                                    <div style="font-size: 2rem; margin-bottom: 6px;">📄</div>
+                                    <span style="font-size: 0.65rem; background: #f3f4f6; color: #374151; padding: 2px 8px; border-radius: 20px; font-weight: 600;">Document</span>
+                                @endif
+                                <div style="margin-top: 8px; font-size: 0.72rem; color: var(--text-1); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $item->name }}">{{ $item->name }}</div>
+                                <div style="font-size: 0.65rem; color: var(--text-3);">{{ number_format($item->size / 1048576, 2) }} Mo</div>
                             </div>
                         </div>
                     @endforeach
                 </div>
             @else
-                <div class="text-center py-4 text-muted">
-                    <p class="mb-2">La médiathèque est vide.</p>
-                    <a href="{{ route('admin.media.index') }}" target="_blank" class="btn btn-sm btn-primary">Ajouter un fichier à la médiathèque</a>
+                <div id="pickerGrid" style="text-align: center; padding: 40px 0; color: var(--text-3);">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">📂</div>
+                    <div style="font-weight: 600; margin-bottom: 6px; color: var(--text-2);">La médiathèque est vide</div>
+                    <div style="font-size: 0.85rem;">Cliquez sur <strong>Téléverser</strong> pour ajouter votre premier fichier.</div>
                 </div>
             @endif
         </div>
+
+        <!-- Footer -->
+        <div style="padding: 12px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-start;">
+            <button onclick="closeMediaPickerModal()" style="padding: 8px 18px; background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--text-2); cursor: pointer; font-size: 0.85rem;">Annuler</button>
+        </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+.picker-card:hover {
+    border-color: var(--primary) !important;
+    background: rgba(var(--primary-rgb, 99, 102, 241), 0.05) !important;
+}
+#pickerSearchInput:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 99, 102, 241), 0.12);
+}
+</style>
+@endpush
+
+@push('scripts')
+<script>
+function uploadFromPicker(input) {
+    if (!input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('_token', '{{ csrf_token() }}');
+
+    const progressWrap = document.getElementById('pickerUploadProgress');
+    const progressBar = document.getElementById('pickerProgressBar');
+    const progressText = document.getElementById('pickerProgressText');
+    progressWrap.style.display = 'flex';
+    progressBar.style.width = '0%';
+    progressText.textContent = '0%';
+
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            progressBar.style.width = pct + '%';
+            progressText.textContent = pct + '%';
+        }
+    };
+
+    xhr.onload = function() {
+        progressWrap.style.display = 'none';
+        if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+                const data = JSON.parse(xhr.responseText);
+                if (data.success && data.media) {
+                    addMediaCardToPicker(data.media);
+                    input.value = '';
+                }
+            } catch(e) {
+                alert('Erreur lors du traitement de la réponse.');
+            }
+        } else {
+            alert("Erreur lors de l'upload.");
+        }
+    };
+
+    xhr.onerror = function() { alert("Erreur de connexion."); progressWrap.style.display = 'none'; };
+    xhr.open('POST', '{{ route('admin.media.store') }}', true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.send(formData);
+}
+
+function addMediaCardToPicker(media) {
+    const grid = document.getElementById('pickerGrid');
+    // Remove empty state if exists
+    if (grid.querySelector('div[style*="text-align: center"]')) {
+        grid.innerHTML = '';
+        grid.className = 'row g-2';
+    }
+
+    const icons = { image: '🖼️', video: '🎥', document: '📄' };
+    const badgeStyles = {
+        image: 'background:#dbeafe;color:#1d4ed8',
+        video: 'background:#fee2e2;color:#b91c1c',
+        document: 'background:#f3f4f6;color:#374151'
+    };
+    const labels = { image: 'Image', video: 'Vidéo', document: 'Document' };
+
+    const col = document.createElement('div');
+    col.className = 'col-6 col-md-3 picker-media-item';
+    col.setAttribute('data-name', media.name.toLowerCase());
+    col.innerHTML = `
+        <div onclick="selectMedia('${media.file_path}', '${media.name.replace(/'/g, "\\'")}')"
+            style="border:2px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:border-color 0.15s,background 0.15s;background:var(--bg-surface);"
+            class="picker-card">
+            <div style="font-size:2rem;margin-bottom:6px;">${icons[media.type] || '📄'}</div>
+            <span style="font-size:0.65rem;${badgeStyles[media.type] || badgeStyles.document};padding:2px 8px;border-radius:20px;font-weight:600;">${labels[media.type] || 'Document'}</span>
+            <div style="margin-top:8px;font-size:0.72rem;color:var(--text-1);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${media.name}">${media.name}</div>
+            <div style="font-size:0.65rem;color:var(--text-3);">${media.size_formatted}</div>
+        </div>`;
+
+    grid.prepend(col);
+
+    const countBadge = document.getElementById('pickerFileCount');
+    if (countBadge) countBadge.textContent = document.querySelectorAll('.picker-media-item').length;
+}
+</script>
+@endpush
+
 @endsection
